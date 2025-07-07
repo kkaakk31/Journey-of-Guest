@@ -13,7 +13,7 @@ namespace JoG.Character {
         public CharacterBody Body { get; private set; }
 
         protected virtual void OnBodyChanged(CharacterBody previous, CharacterBody next) {
-            if (previous != null && next == null) {
+            if (previous != null && next == null && NetworkObject.IsSpawned) {
                 NetworkObject.Despawn();
             }
         }

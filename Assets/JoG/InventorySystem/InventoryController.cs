@@ -38,6 +38,9 @@ namespace JoG.InventorySystem {
             inventory.ExchangeItemSafe(fromIndex, toIndex);
             uiController.RefreshSlot(fromIndex);
             uiController.RefreshSlot(toIndex);
+            if (selectedIndex == fromIndex || selectedIndex == toIndex) {
+                SelectItem(selectedIndex);
+            }
         }
 
         [Inject]
@@ -52,6 +55,7 @@ namespace JoG.InventorySystem {
                 return;
             }
             _itemController = _body.GetComponent<ItemController>();
+            _itemController.InventoryController = this;
             var item = inventory.GetItemSafe(selectedIndex);
             if (item.Count > 0) {
                 _itemController.Use(item);
@@ -61,18 +65,27 @@ namespace JoG.InventorySystem {
         public int AddItem(ItemData item, byte count) {
             var index = inventory.AddItem(item, count);
             uiController.RefreshSlot(index);
+            if (index == selectedIndex) {
+                SelectItem(index);
+            }
             return index;
         }
 
         public void RemoveItem(int index, byte count) {
             inventory.RemoveItem(index, count);
             uiController.RefreshSlot(index);
+            if (index == selectedIndex) {
+                SelectItem(index);
+            }
         }
 
         public int RemoveItem(ItemData item, byte count) {
-            var itemIndex = inventory.RemoveItem(item, count);
-            uiController.RefreshSlot(itemIndex);
-            return itemIndex;
+            var index = inventory.RemoveItem(item, count);
+            uiController.RefreshSlot(index);
+            if (index == selectedIndex) {
+                SelectItem(index);
+            }
+            return index;
         }
 
         public void SelectItem(int index) {

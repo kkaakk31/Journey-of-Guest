@@ -1,28 +1,25 @@
 ﻿using JoG.DebugExtensions;
 using System.Runtime.InteropServices;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
 namespace JoG {
 
-    public class JoGTest : MonoBehaviour {
-        public InputAction action;
-
+    public class JoGTest : NetworkBehaviour {
         private void Awake() {
-            //action.started += HandleActionStateChanged;
-            action.performed += HandleActionStateChanged;
-            //action.canceled += HandleActionStateChanged;
-            action.Enable();
+            this.Log(transform.position);
         }
 
-        private void HandleActionStateChanged(InputAction.CallbackContext context) {
-            this.Log((context.control as KeyControl).keyCode);
-            this.Log(context.ReadValueAsObject());
+        private void Start() {
+            this.Log(transform.position);
         }
 
-        private void Coll() {
-             
+        protected override void OnNetworkPostSpawn() {
+            base.OnNetworkPostSpawn();
+            this.Log(transform.position);
         }
+         
     }
 }

@@ -43,7 +43,6 @@ namespace JoG.UI.Managers {
 
         [Inject]
         private void Construct(IBufferedSubscriber<CharacterBodyChangedMessage> subscriber) {
-            _spawnPanel.SetActive(false);
             _disposable = subscriber.Subscribe(this);
         }
 

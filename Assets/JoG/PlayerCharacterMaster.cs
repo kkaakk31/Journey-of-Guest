@@ -1,5 +1,6 @@
 ﻿using GuestUnion.ObjectPool.Generic;
 using JoG.Character;
+using JoG.DebugExtensions;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;

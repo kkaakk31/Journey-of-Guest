@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RandomElementsSystem.Types;
+using System;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;
@@ -13,10 +14,12 @@ namespace JoG {
         [Inject] private IAuthenticationService _authenticationService;
         private PlayerCharacterMaster _playerCharacterMaster;
         [SerializeField] private GameObject[] _autoInjectObjects = Array.Empty<GameObject>();
+        [SerializeField] private SelectiveRandomWeightTransform _spawnPoints;
 
         public void SpawnCharacter() {
             if (_playerCharacterMaster == null) return;
-            transform.GetPositionAndRotation(out var position, out var rotation);
+            var spanwPoint = _spawnPoints.GetRandomValue();
+            spanwPoint.GetPositionAndRotation(out var position, out var rotation);
             var nob = NetworkManager.SpawnManager.InstantiateAndSpawn(
                 characterPrefab,
                 destroyWithScene: true,

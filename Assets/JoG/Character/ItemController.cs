@@ -13,7 +13,7 @@ namespace JoG.Character {
         private InventoryItem currentItem;
         private GameObject currentHandItem;
         public List<IItemHandler> Handlers { get; private set; }
-        public IInventoryController InventoryController { get; set; }
+        public InventoryController InventoryController { get; set; }
 
         public void RemoveCurrentItemCount(byte count) {
             if (currentItem == null) {
