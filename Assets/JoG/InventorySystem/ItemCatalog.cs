@@ -7,7 +7,7 @@ using YooAsset;
 
 namespace JoG.InventorySystem {
 
-    public static class ItemCollector {
+    public static class ItemCatalog {
         private static readonly Dictionary<string, ItemData> _nameToItemDatas = new();
         public static IReadOnlyDictionary<string, ItemData> AllItems => _nameToItemDatas;
 
@@ -33,14 +33,15 @@ namespace JoG.InventorySystem {
         public static void RegisterFromPackage(ResourcePackage package) {
             if (package == null) throw new ArgumentNullException(nameof(package));
             foreach (var assetInfo in package.GetAssetInfos("item").AsSpan()) {
-                var op = package.LoadAssetSync(assetInfo);
-                if (op.Status == EOperationStatus.Succeed) {
-                    if (op.AssetObject is ItemData itemData) {
+                var ah = package.LoadAssetSync(assetInfo);
+                if (ah.Status == EOperationStatus.Succeed) {
+                    if (ah.AssetObject is ItemData itemData) {
                         Register(itemData);
                     } else {
-                        Debug.LogWarning($"[Asset: {op.AssetObject}] '{assetInfo.AssetPath}' is not of type ItemData. Skipping registration.");
+                        Debug.LogWarning($"[Asset: {ah.AssetObject}] '{assetInfo.AssetPath}' is not of type ItemData. Skipping registration.");
                     }
                 }
+                ah.Release(); // 确保释放AssetHandle以避免内存泄漏
             }
         }
 

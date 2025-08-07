@@ -24,7 +24,7 @@ namespace JoG.InventorySystem {
 
         [Button]
         public int AddItem(string itemName, int count) {
-            if (ItemCollector.TryGetItemDef(itemName, out var itemData)) {
+            if (ItemCatalog.TryGetItemDef(itemName, out var itemData)) {
                 var index = inventory.AddItem(itemData, (byte)count);
                 uiController.RefreshSlot(index);
                 return index;
@@ -54,10 +54,9 @@ namespace JoG.InventorySystem {
                 _itemController = null;
                 return;
             }
-            _itemController = _body.GetComponent<ItemController>();
-            _itemController.InventoryController = this;
-            var item = inventory.GetItemSafe(selectedIndex);
-            if (item.Count > 0) {
+            if (_body.TryGetComponent(out _itemController)) {
+                _itemController.InventoryController = this;
+                var item = inventory.GetItemSafe(selectedIndex);
                 _itemController.Use(item);
             }
         }
@@ -97,8 +96,9 @@ namespace JoG.InventorySystem {
 
         private void Awake() {
             // 数据初始化
-            var inventoryStr = PlayerPrefs.GetString("player_inventory", string.Empty);
-            inventory = Inventory.FromJson(inventoryStr) ?? new Inventory(60);
+            inventory = new Inventory(60);
+            var inventoryJson = PlayerPrefs.GetString("player_inventory", string.Empty);
+            inventory.FromJson(inventoryJson);
         }
 
         private void Start() {

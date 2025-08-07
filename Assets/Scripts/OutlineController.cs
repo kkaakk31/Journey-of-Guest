@@ -5,8 +5,9 @@ using UnityEngine;
 namespace JoG {
 
     public class OutlineController : MonoBehaviour {
-        [Required] public Outline outline;
+        [SerializeField, Required] private Outline outline;
         private float _outlineDuration;
+        public Outline Outline => outline;
         public Color OutlineColor { get => outline.OutlineColor; set => outline.OutlineColor = value; }
         public float OutlineWidth { get => outline.OutlineWidth; set => outline.OutlineWidth = value; }
 

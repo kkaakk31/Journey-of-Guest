@@ -302,7 +302,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   interactiveLayer:
     serializedVersion: 2
-    m_Bits: 265
+    m_Bits: 329
   maxDistance: 3
 --- !u!114 &7129848452394537671
 MonoBehaviour:
@@ -980,7 +980,7 @@ GameObject:
   - component: {fileID: 9102207783015911174}
   - component: {fileID: 9063947961052601354}
   - component: {fileID: 1099096398687094651}
-  - component: {fileID: 7702700570468243379}
+  - component: {fileID: 2008154785561793074}
   m_Layer: 6
   m_Name: Model
   m_TagString: Untagged
@@ -1152,7 +1152,7 @@ MonoBehaviour:
   <Top>k__BackingField: {fileID: 2314476250633445273}
   <Center>k__BackingField: {fileID: 1312550768482060441}
   <Bottom>k__BackingField: {fileID: 7626038366035198817}
---- !u!114 &7702700570468243379
+--- !u!114 &2008154785561793074
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1161,10 +1161,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7730539439455128377}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba6dc71a2dad1f8409f5bcb53014f657, type: 3}
+  m_Script: {fileID: 11500000, guid: 7035d2d5f9f170d4bb194b7943ac81a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
+  <Body>k__BackingField: {fileID: 2297808037990051093}
 --- !u!1 &7782441815850036851
 GameObject:
   m_ObjectHideFlags: 0

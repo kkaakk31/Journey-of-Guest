@@ -19,7 +19,9 @@ namespace JoG.Localization {
         }
 
         public static string GetString(string key) {
-            return _table.TryGetValue(key, out var value) ? value : string.Empty;
+            return key is null
+                ? string.Empty
+                : (_table.TryGetValue(key, out var value) ? value : string.Empty);
         }
 
 #if UNITY_EDITOR

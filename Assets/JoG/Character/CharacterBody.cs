@@ -16,6 +16,7 @@ namespace JoG.Character {
         [SerializeField] private Transform _aimOriginTransform;
         [SerializeField] private Transform _aimTargetTransform;
         private CharacterMaster _master;
+        public CharacterMaster Master => _master;
         public static ReadOnlySpan<CharacterBody> Characters => _characters.AsSpan();
         public Animator Animator => _model.Animator;
 

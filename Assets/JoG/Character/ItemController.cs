@@ -6,6 +6,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Runtime.InteropServices;
 using JoG.InteractionSystem;
+using GuestUnion.ObjectPool.Generic;
 
 namespace JoG.Character {
 
@@ -53,19 +54,22 @@ namespace JoG.Character {
         }
 
         void IInteractionMessageHandler.Handle(IInteractable interactableObject) {
-            if(interactableObject is PickupItem pickupItem) {
+            if (interactableObject is PickupItem pickupItem) {
                 InventoryController.AddItem(pickupItem.itemData, pickupItem.count);
             }
         }
 
         protected virtual void Awake() {
-            Handlers = new List<IItemHandler>();
+            Handlers = ListPool<IItemHandler>.shared.Rent();
             GetComponentsInChildren(true, Handlers);
         }
 
         protected virtual void OnDisable() {
-            // 销毁手上物品
             Use(null);
+        }
+
+        protected virtual void OnDestroy() {
+            ListPool<IItemHandler>.shared.Return(Handlers);
         }
     }
 }

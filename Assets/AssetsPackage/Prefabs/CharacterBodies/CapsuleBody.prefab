@@ -971,7 +971,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   interactiveLayer:
     serializedVersion: 2
-    m_Bits: 265
+    m_Bits: 329
   maxDistance: 3
 --- !u!114 &7814115597774941169
 MonoBehaviour:

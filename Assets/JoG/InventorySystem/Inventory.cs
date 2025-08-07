@@ -28,25 +28,6 @@ namespace JoG.InventorySystem {
             set => _items[index] = value;
         }
 
-        public static Inventory FromJson(string json) {
-            if (json.IsNullOrEmpty()) {
-                return null;
-            }
-            var inventoryItemDatas = JsonConvert.DeserializeObject<InventoryItemData[]>(json);
-            if (inventoryItemDatas.IsNullOrEmpty()) {
-                return null;
-            }
-            var inventory = new Inventory(inventoryItemDatas.Length);
-            for (var i = 0; i < inventoryItemDatas.Length; ++i) {
-                var inventoryItemData = inventoryItemDatas[i];
-                if (inventoryItemData.itemCount > 0) {
-                    ItemCollector.TryGetItemDef(inventoryItemData.itemNameToken, out var itemData);
-                    inventory._items[i].SetDataAndCount(itemData, inventoryItemData.itemCount);
-                }
-            }
-            return inventory;
-        }
-
         public void PublishItemChanged(int index) {
             foreach (var handler in _itemChangedHandlers.AsSpan()) {
                 handler.Invoke(index);
@@ -127,12 +108,32 @@ namespace JoG.InventorySystem {
                     if (item.Count > count) {
                         item.Count -= count;
                     } else {
-                        item.ResetDataAndCount();
+                        item.SetDataAndCount();
                     }
                     return i;
                 }
             }
             return -1;
+        }
+
+        public void FromJson(string json) {
+            if (json.IsNullOrEmpty()) {
+                return;
+            }
+            var inventoryItemDatas = JsonConvert.DeserializeObject<InventoryItemData[]>(json);
+            if (inventoryItemDatas.IsNullOrEmpty()) {
+                return;
+            }
+            var span = inventoryItemDatas.AsSpan();
+            var size = span.Length;
+            Array.Resize(ref _items, size);
+            for (var i = 0; i < size; ++i) {
+                var inventoryItemData = span[i];
+                if (inventoryItemData.itemCount > 0) {
+                    ItemCatalog.TryGetItemDef(inventoryItemData.itemNameToken, out var itemData);
+                    _items[i].SetDataAndCount(itemData, inventoryItemData.itemCount);
+                }
+            }
         }
 
         public string ToJson() {
