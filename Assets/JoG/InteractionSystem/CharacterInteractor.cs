@@ -1,4 +1,5 @@
 ﻿using JoG.Character;
+using JoG.Character.InputBanks;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ namespace JoG.InteractionSystem {
     public class CharacterInteractor : Interactor {
         public LayerMask interactiveLayer;
         [Range(0, float.MaxValue)] public float maxDistance = 3f;
+        private Vector3InputBank _aimInputBank;
         public CharacterBody Body { get; private set; }
 
         public void FindAndInteract(in Vector3 origin, in Vector3 direction) {
@@ -25,13 +27,19 @@ namespace JoG.InteractionSystem {
             return false;
         }
 
-        public void FindAndInteract() => FindAndInteract(Body.AimOrigin, Body.AimVector);
+        public void FindAndInteract() {
+            var aimOrigin = Body.AimOrigin;
+            FindAndInteract(aimOrigin, _aimInputBank.vector3 - aimOrigin);
+        }
 
-        public bool FindInteractableObject(out GameObject result) =>
-            FindInteractableObject(Body.AimOrigin, Body.AimVector, out result);
+        public bool FindInteractableObject(out GameObject result) {
+            var aimOrigin = Body.AimOrigin;
+            return FindInteractableObject(aimOrigin, _aimInputBank.vector3 - aimOrigin, out result);
+        }
 
         protected void Awake() {
             Body = GetComponent<CharacterBody>();
+            _aimInputBank = Body.GetInputBank<Vector3InputBank>("Aim");
         }
 
         protected void Reset() {

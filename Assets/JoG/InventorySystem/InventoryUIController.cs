@@ -1,12 +1,10 @@
 ﻿using EditorAttributes;
 using GuestUnion;
-using JoG.Messages;
-using MessagePipe;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using VContainer;
+using UnityEngine.InputSystem;
 
 namespace JoG.InventorySystem {
 
@@ -14,12 +12,13 @@ namespace JoG.InventorySystem {
 
         [Header("依赖组件")]
         [Required] public InventoryController inventoryController;
-
+        public GameObject inventoryRoot;
         public GameObject tablePanel;
         public GameObject hotBarPanel;
         public DragItem dragItem;
         public Color selectedColor = Color.yellow;
         public Color normalColor = Color.white;
+        [SerializeField, Required] private InputActionReference _uiToggle;
         private List<Slot> slots = new();
         private Slot selectedSlot;
 
@@ -37,10 +36,10 @@ namespace JoG.InventorySystem {
 
         public void HighlightAt(int selectedIndex) {
             if (selectedSlot != null) {
-                selectedSlot.iconImage.color = normalColor;
+                selectedSlot.slotImage.color = normalColor;
             }
             if (slots.TryGetAt(selectedIndex, out selectedSlot)) {
-                selectedSlot.iconImage.color = selectedColor;
+                selectedSlot.slotImage.color = selectedColor;
             }
         }
 
@@ -71,24 +70,36 @@ namespace JoG.InventorySystem {
             }
         }
 
-        private void Start() {
+        private void OnEnable() {
+            inventoryRoot.SetActive(true);
+            tablePanel.SetActive(false);
+            hotBarPanel.SetActive(true);
             RefreshAllSlots();
             HighlightAt(inventoryController.selectedIndex);
-            tablePanel.SetActive(false);
+            _uiToggle.action.performed += OnUIToggle;
+            _uiToggle.action.Enable();
         }
 
-        private void Update() {
-            // Tab键切换背包面板
-            if (UnityEngine.InputSystem.Keyboard.current.tabKey.wasPressedThisFrame) {
-                if (tablePanel.activeSelf) {
-                    tablePanel.SetActive(false);
-                    PlayerCharacterInputer.Instance.RequestEnableInput();
-                    CursorManager.Instance.ReleaseShowCursor();
-                } else {
-                    tablePanel.SetActive(true);
-                    PlayerCharacterInputer.Instance.ReleaseEnableInput();
-                    CursorManager.Instance.RequestShowCursor();
-                }
+        private void OnDisable() {
+            if (tablePanel.activeSelf) {
+                tablePanel.SetActive(false);
+                PlayerCharacterInputer.Instance.RequestEnableInput();
+                CursorManager.Instance.ReleaseShowCursor();
+            }
+            inventoryRoot.SetActive(false);
+            _uiToggle.action.Disable();
+            _uiToggle.action.performed -= OnUIToggle;
+        }
+
+        private void OnUIToggle(InputAction.CallbackContext callback) {
+            if (tablePanel.activeSelf) {
+                tablePanel.SetActive(false);
+                PlayerCharacterInputer.Instance.RequestEnableInput();
+                CursorManager.Instance.ReleaseShowCursor();
+            } else {
+                tablePanel.SetActive(true);
+                PlayerCharacterInputer.Instance.ReleaseEnableInput();
+                CursorManager.Instance.RequestShowCursor();
             }
         }
     }

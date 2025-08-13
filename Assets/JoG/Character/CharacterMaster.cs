@@ -12,19 +12,32 @@ namespace JoG.Character {
 
         public CharacterBody Body { get; private set; }
 
-        protected virtual void OnBodyChanged(CharacterBody previous, CharacterBody next) {
-            if (previous != null && next == null && NetworkObject.IsSpawned) {
-                NetworkObject.Despawn();
-            }
+        protected virtual void OnBodyChanged(in CharacterBodyChangedMessage message) {
+            //if (message.changeType is CharacterBodyChangeType.Lose && NetworkObject.IsSpawned) {
+            //    NetworkObject.Despawn();
+            //}
         }
 
         protected virtual void OnTransformChildrenChanged() {
-            var nextBody = GetComponentInChildren<CharacterBody>();
-            if (nextBody == Body) return;
-            var message = new CharacterBodyChangedMessage() { previous = Body, next = nextBody };
-            Body = nextBody;
-            _bodyChangedMessagePublisher.Publish(message);
-            OnBodyChanged(message.previous, message.next);
+            var body = GetComponentInChildren<CharacterBody>();
+            if (Body == body) return;
+            if (Body != null) {
+                var message = new CharacterBodyChangedMessage {
+                    changeType = CharacterBodyChangeType.Lose,
+                    body = Body,
+                };
+                _bodyChangedMessagePublisher.Publish(message);
+                OnBodyChanged(message);
+            }
+            if (body != null) {
+                var message = new CharacterBodyChangedMessage {
+                    changeType = CharacterBodyChangeType.Get,
+                    body = body,
+                };
+                _bodyChangedMessagePublisher.Publish(message);
+                OnBodyChanged(message);
+            }
+            Body = body;
         }
     }
 }

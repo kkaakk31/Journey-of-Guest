@@ -23,11 +23,10 @@ namespace JoG.UI.Controllers {
         private IDisposable _disposable;
 
         void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
-            var next = message.next;
-            if (next != null && !next.IsLocalPlayer) {
+            if (message.changeType is CharacterBodyChangeType.Get && !message.body.IsLocalPlayer) {
                 _canvas.gameObject.SetActive(true);
-                _character = next;
-                _model = next.Model;
+                _character = message.body;
+                _model = message.body.Model;
                 enabled = true;
             } else {
                 _model = null;

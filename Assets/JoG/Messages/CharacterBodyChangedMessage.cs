@@ -2,8 +2,14 @@
 
 namespace JoG.Messages {
 
+    public enum CharacterBodyChangeType {
+        None,
+        Get,
+        Lose,
+    }
+
     public struct CharacterBodyChangedMessage {
-        public CharacterBody previous;
-        public CharacterBody next;
+        public CharacterBodyChangeType changeType;
+        public CharacterBody body;
     }
 }

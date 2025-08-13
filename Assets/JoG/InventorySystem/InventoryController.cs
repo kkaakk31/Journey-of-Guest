@@ -49,15 +49,20 @@ namespace JoG.InventorySystem {
         }
 
         void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
-            _body = message.next;
-            if (_body is null) {
-                _itemController = null;
-                return;
-            }
-            if (_body.TryGetComponent(out _itemController)) {
+            _body = message.body;
+            if (message.changeType is CharacterBodyChangeType.Get && _body.TryGetComponent(out _itemController)) {
+                enabled = true;
+                uiController.enabled = true;
                 _itemController.InventoryController = this;
                 var item = inventory.GetItemSafe(selectedIndex);
                 _itemController.Use(item);
+            } else {
+                enabled = false;
+                uiController.enabled = false;
+                if (_itemController != null) {
+                    _itemController.InventoryController = null;
+                }
+                _itemController = null;
             }
         }
 
@@ -101,15 +106,19 @@ namespace JoG.InventorySystem {
             inventory.FromJson(inventoryJson);
         }
 
-        private void Start() {
+        private void OnEnable() {
             numberInput.action.performed += OnNumInput;
             numberInput.action.Enable();
+        }
+
+        private void OnDisable() {
+            numberInput.action.performed -= OnNumInput;
+            numberInput.action.Disable();
         }
 
         private void OnDestroy() {
             PlayerPrefs.SetString("player_inventory", inventory.ToJson());
             PlayerPrefs.Save();
-            numberInput.action.Disable();
             _disposable?.Dispose();
         }
 

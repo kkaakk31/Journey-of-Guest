@@ -12,6 +12,7 @@ using VContainer;
 namespace JoG.CameraSystem {
 
     public class FreeCameraController : MonoBehaviour, IMessageHandler<CharacterBodyChangedMessage>, IEye {
+        public LayerMask aimCollisionFilter;
         private float cameraEulerX, cameraEulerY, cameraEulerZ;
         private Transform _cachedTrackingTarget;
         private Transform _positionFollow;
@@ -19,11 +20,8 @@ namespace JoG.CameraSystem {
         private InputAction _lookInput;
         private Vector3InputBank _aimInputBank;
         [field: SerializeField, Required] public CinemachineCamera ThirdPersonCamera { get; private set; }
-        [field: SerializeField, Required] public CinemachineThirdPersonAim ThirdPersonAim { get; private set; }
 
         public Transform Follow { get => _positionFollow; set => _positionFollow = value; }
-
-        public Vector3 AimTarget => ThirdPersonAim.AimTarget;
 
         public Vector3 AimPosition { get; private set; }
 
@@ -34,9 +32,9 @@ namespace JoG.CameraSystem {
         public GameObject AimObject { get; private set; }
 
         void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
-            if (message.next != null) {
-                Follow = message.next.AimOriginTransform;
-                _aimInputBank = message.next.GetInputBank<Vector3InputBank>("Aim");
+            if (message.changeType is CharacterBodyChangeType.Get) {
+                Follow = message.body.AimOriginTransform;
+                _aimInputBank = message.body.GetInputBank<Vector3InputBank>("Aim");
             } else {
                 Follow = null;
                 _aimInputBank = null;
@@ -58,15 +56,18 @@ namespace JoG.CameraSystem {
         }
 
         private void Update() {
-
-            AimPosition = ThirdPersonAim.AimTarget;
             AimOrigin = ThirdPersonCamera.State.GetFinalPosition();
-            AimVector3 = AimPosition - AimOrigin;
-            Physics.Raycast(AimOrigin, AimVector3, out var hit, 1000, ThirdPersonAim.AimCollisionFilter, QueryTriggerInteraction.Ignore);
-            AimObject = hit.collider?.gameObject;
+            AimVector3 = ThirdPersonCamera.State.GetFinalOrientation() * Vector3.forward;
+            if (Physics.Raycast(AimOrigin, AimVector3, out var hit, 1000, aimCollisionFilter, QueryTriggerInteraction.Ignore)) {
+                AimPosition = hit.point;
+                AimObject = hit.collider.gameObject;
+            } else {
+                AimPosition = AimOrigin + AimVector3 * 1000;
+                AimObject = null;
+            }
             if (_positionFollow == null) return;
             _cachedTrackingTarget.position = _positionFollow.position;
-            _aimInputBank.vector3 = ThirdPersonAim.AimTarget;
+            _aimInputBank.vector3 = AimPosition;
         }
 
         private void OnDisable() {

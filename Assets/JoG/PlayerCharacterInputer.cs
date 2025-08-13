@@ -29,8 +29,8 @@ namespace JoG {
         public static PlayerCharacterInputer Instance { get; private set; }
 
         void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
-            var character = message.previous;
-            if (character is not null && character.IsLocalPlayer) {
+            var body = message.body;
+            if (message.changeType is CharacterBodyChangeType.Lose && body.IsLocalPlayer) {
                 interactInputBank = null;
                 jumpInputBank = null;
                 moveInputBank = null;
@@ -40,16 +40,14 @@ namespace JoG {
                 sprintInputBank = null;
                 UnregisterCallback();
                 ReleaseEnableInput();
-            }
-            character = message.next;
-            if (character is not null && character.IsLocalPlayer) {
-                interactInputBank = character.GetInputBank<TriggerInputBank>("Interact");
-                jumpInputBank = character.GetInputBank<TriggerInputBank>("Jump");
-                moveInputBank = character.GetInputBank<Vector3InputBank>("Move");
-                primaryActionInputBank = character.GetInputBank<TriggerInputBank>("PrimaryAction");
-                secondaryActionInputBank = character.GetInputBank<TriggerInputBank>("SecondaryAction");
-                skillInputBank = character.GetInputBank<TriggerInputBank>("Skill");
-                sprintInputBank = character.GetInputBank<BooleanInputBank>("Sprint");
+            } else if (message.changeType is CharacterBodyChangeType.Get && body.IsLocalPlayer) {
+                interactInputBank = body.GetInputBank<TriggerInputBank>("Interact");
+                jumpInputBank = body.GetInputBank<TriggerInputBank>("Jump");
+                moveInputBank = body.GetInputBank<Vector3InputBank>("Move");
+                primaryActionInputBank = body.GetInputBank<TriggerInputBank>("PrimaryAction");
+                secondaryActionInputBank = body.GetInputBank<TriggerInputBank>("SecondaryAction");
+                skillInputBank = body.GetInputBank<TriggerInputBank>("Skill");
+                sprintInputBank = body.GetInputBank<BooleanInputBank>("Sprint");
                 RegisterCallback();
                 RequestEnableInput();
             }

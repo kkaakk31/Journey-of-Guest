@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace JoG.InventorySystem {
 
-    [System.Serializable]
     public class InventoryItem {
         private Inventory _inventory;
         private ItemData _data;

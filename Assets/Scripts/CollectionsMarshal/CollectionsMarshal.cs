@@ -417,7 +417,7 @@ namespace System.Runtime.InteropServices {
             ref var entries = ref dictionary._entries;
             // Debug.Assert(entries != null, "expected entries to be non-null");
 
-            IEqualityComparer<TKey>? comparer = dictionary._comparer;
+            var comparer = dictionary._comparer;
             // Debug.Assert(comparer is not null || typeof(TKey).IsValueType);
             uint hashCode = (uint)(comparer != null ? comparer.GetHashCode(key) : key.GetHashCode());
 
@@ -428,8 +428,9 @@ namespace System.Runtime.InteropServices {
             if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
                 comparer == null) {
                 // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
+                comparer = EqualityComparer<TKey>.Default;
                 while ((uint)i < (uint)entries.Length) {
-                    if (entries[i].hashCode == hashCode && EqualityComparer<TKey>.Default.Equals(entries[i].key, key)) {
+                    if (entries[i].hashCode == hashCode && comparer.Equals(entries[i].key, key)) {
                         exists = true;
 
                         return ref entries[i].value!;
@@ -438,14 +439,15 @@ namespace System.Runtime.InteropServices {
                     i = entries[i].next;
 
                     collisionCount++;
-                    if (collisionCount > (uint)entries.Length) {
+                    if (collisionCount > entries.Length) {
                         // The chain of entries forms a loop; which means a concurrent update has happened.
                         // Break out of the loop and throw, rather than looping forever.
                         throw new InvalidOperationException("Concurrent operations are not supported.");
                     }
                 }
             } else {
-                // Debug.Assert(comparer is not null);
+                //Debug.Assert(comparer is not null);
+                comparer ??= EqualityComparer<TKey>.Default;
                 while ((uint)i < (uint)entries.Length) {
                     if (entries[i].hashCode == hashCode && comparer.Equals(entries[i].key, key)) {
                         exists = true;

@@ -1,6 +1,5 @@
-﻿using GuestUnion.ObjectPool.Generic;
-using JoG.Character;
-using JoG.DebugExtensions;
+﻿using JoG.Character;
+using JoG.Messages;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -49,21 +48,7 @@ namespace JoG {
             _players.Remove(this);
         }
 
-        protected override void OnBodyChanged(CharacterBody previous, CharacterBody next) {
-            using (ListPool<Collider>.Rent(out var buffer)) {
-                if (previous != null) {
-                    previous.GetComponentsInChildren(buffer);
-                    foreach (var c in buffer.AsSpan()) {
-                        c.tag = "HitCollider";
-                    }
-                }
-                if (next is not null) {
-                    next.GetComponentsInChildren(buffer);
-                    foreach (var c in buffer.AsSpan()) {
-                        c.tag = "LocalPlayerCharacterCollider";
-                    }
-                }
-            }
+        protected override void OnBodyChanged(in CharacterBodyChangedMessage message) {
         }
     }
 }

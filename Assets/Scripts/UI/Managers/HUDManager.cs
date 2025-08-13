@@ -23,33 +23,37 @@ namespace JoG.UI.Managers {
         private IDisposable _disposable;
 
         void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
-            var source = message.previous;
-            if (source is not null && source.IsLocalPlayer) {
-                _source = null;
-                _interactor = null;
-                _spawnPanel.SetActive(true);
-                enabled = false;
-                CursorManager.Instance.RequestShowCursor();
-            }
-            source = message.next;
-            if (source is not null && source.IsLocalPlayer) {
-                _interactor = source.GetComponent<CharacterInteractor>();
-                _spawnPanel.SetActive(false);
-                _source = source;
-                enabled = true;
-                CursorManager.Instance.ReleaseShowCursor();
+            _source = message.body;
+            switch (message.changeType) {
+                case CharacterBodyChangeType.None:
+                    _interactor = null;
+                    _spawnPanel.SetActive(true);
+                    enabled = false;
+                    return;
+
+                case CharacterBodyChangeType.Lose:
+                    if (_source.IsLocalPlayer) {
+                        _interactor = null;
+                        _spawnPanel.SetActive(true);
+                        enabled = false;
+                        CursorManager.Instance.RequestShowCursor();
+                    }
+                    break;
+
+                case CharacterBodyChangeType.Get:
+                    if (_source.IsLocalPlayer) {
+                        _interactor = _source.GetComponent<CharacterInteractor>();
+                        _spawnPanel.SetActive(false);
+                        enabled = true;
+                        CursorManager.Instance.ReleaseShowCursor();
+                    }
+                    break;
             }
         }
 
         [Inject]
         private void Construct(IBufferedSubscriber<CharacterBodyChangedMessage> subscriber) {
             _disposable = subscriber.Subscribe(this);
-        }
-
-        private void OnEnable() {
-            if (_source == null) {
-                enabled = false;
-            }
         }
 
         private void Update() {

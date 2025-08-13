@@ -11,7 +11,7 @@ namespace JoG.States {
         [SerializeField] private CharacterInteractor interactor;
         [SerializeField] private RigidbodyJump jump;
         [SerializeField] private RigidbodySprint sprint;
-        [SerializeField] private CharacterBody character;
+        [SerializeField] private CharacterBody body;
         [SerializeField] private CharacterModel model;
         private Vector3InputBank moveInput;
         private Vector3InputBank aimInput;
@@ -21,11 +21,11 @@ namespace JoG.States {
 
         protected override void Awake() {
             base.Awake();
-            moveInput = character.GetInputBank<Vector3InputBank>("Move");
-            aimInput = character.GetInputBank<Vector3InputBank>("Aim");
-            jumpInput = character.GetInputBank<TriggerInputBank>("Jump");
-            interactInput = character.GetInputBank<TriggerInputBank>("Interact");
-            sprintInput = character.GetInputBank<BooleanInputBank>("Sprint");
+            moveInput = body.GetInputBank<Vector3InputBank>("Move");
+            aimInput = body.GetInputBank<Vector3InputBank>("Aim");
+            jumpInput = body.GetInputBank<TriggerInputBank>("Jump");
+            interactInput = body.GetInputBank<TriggerInputBank>("Interact");
+            sprintInput = body.GetInputBank<BooleanInputBank>("Sprint");
         }
 
         protected void OnEnable() {
@@ -33,12 +33,11 @@ namespace JoG.States {
         }
 
         protected override void Update() {
-            var aimOrigin = character.AimOrigin;
+            var aimOrigin = body.AimOrigin;
             var aimTarget = aimInput.vector3;
             var aimDirection = (aimTarget - aimOrigin).normalized;
             characterController.UpdateAimDirection(aimDirection); ;
             characterController.UpdateMoveDirection(Quaternion.LookRotation(aimDirection, characterController.CharacterUp) * moveInput.vector3);
-            character.AimTarget = aimTarget;
             sprint.IsSprinting = sprintInput.Value;
             if (jumpInput.Triggered && jump.TryJump()) {
                 jumpInput.Reset();

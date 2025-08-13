@@ -11,6 +11,7 @@ namespace JoG.InventorySystem {
         [NonSerialized] public int index;
         public GameObject iconGameObject;
         public Image iconImage;
+        public Image slotImage;
         public TMP_Text countText;
 
         public void UpdateView(InventoryItem inventoryItem) {
@@ -53,6 +54,10 @@ namespace JoG.InventorySystem {
                 iconGameObject.SetActive(true);
             }
             controller.HideDragItem();
+        }
+
+        private void Awake() {
+            slotImage ??= GetComponent<Image>();
         }
     }
 }

@@ -471,7 +471,7 @@ MonoBehaviour:
   nextStates:
   - {fileID: 7527252172634286026}
   <TransitonPriority>k__BackingField: 128
-  duration: 1
+  duration: 0
 --- !u!114 &7527252172634286026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -491,7 +491,7 @@ MonoBehaviour:
   interactor: {fileID: -3920292720844620889}
   jump: {fileID: 5531461399630025779}
   sprint: {fileID: 8480917765558318605}
-  character: {fileID: 1367351897065705305}
+  body: {fileID: 1367351897065705305}
   model: {fileID: 7870270323345327983}
 --- !u!114 &3837286984285025634
 MonoBehaviour:
@@ -508,7 +508,7 @@ MonoBehaviour:
   nextStates:
   - {fileID: 473850590981542742}
   <TransitonPriority>k__BackingField: 128
-  despawnDelay: 5
+  despawnDelay: 0
 --- !u!1 &4898479296429606253
 GameObject:
   m_ObjectHideFlags: 0
@@ -649,7 +649,7 @@ Animator:
   m_GameObject: {fileID: 5940989735750854457}
   m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8d15041a5a48fd346ab17e240b9e5db3, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -891,7 +891,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   _model: {fileID: 7870270323345327983}
   _aimOriginTransform: {fileID: 4440793574485330580}
-  _aimTargetTransform: {fileID: 7266316803991410015}
   _maxHPBase: 100
 --- !u!114 &4392522684828096243
 MonoBehaviour:
