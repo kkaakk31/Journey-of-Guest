@@ -10,7 +10,7 @@ namespace JoG {
 
     public class PlayerManager : NetworkBehaviour {
         public NetworkObject networkPlayerPrefab;
-        public NetworkObject characterPrefab;
+        public NetworkObject defaultBodyPrefab;
         [Inject] private IAuthenticationService _authenticationService;
         private PlayerCharacterMaster _playerCharacterMaster;
         [SerializeField] private GameObject[] _autoInjectObjects = Array.Empty<GameObject>();
@@ -21,7 +21,7 @@ namespace JoG {
             var spanwPoint = _spawnPoints.GetRandomValue();
             spanwPoint.GetPositionAndRotation(out var position, out var rotation);
             var nob = NetworkManager.SpawnManager.InstantiateAndSpawn(
-                characterPrefab,
+                defaultBodyPrefab,
                 destroyWithScene: true,
                 isPlayerObject: true,
                 position: position,

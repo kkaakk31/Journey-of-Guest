@@ -11,7 +11,7 @@ namespace JoG.Character {
     [DisallowMultipleComponent]
     public partial class CharacterBody : NetworkBehaviour {
         private static readonly List<CharacterBody> _characters = new();
-        private Dictionary<string, InputBank> _nameToInputBank = new();
+        private readonly Dictionary<string, InputBank> _nameToInputBank = new();
         [SerializeField] private CharacterModel _model;
         [SerializeField] private Transform _aimOriginTransform;
         private CharacterMaster _master;
@@ -57,13 +57,20 @@ namespace JoG.Character {
         }
 
         public T GetInputBank<T>(string name) where T : InputBank, new() {
-            ref var inputBankRef = ref _nameToInputBank.GetValueRefOrAddDefault(name, out var exists);
-            if (exists) {
-                return inputBankRef as T;
+            //ref var inputBankRef = ref _nameToInputBank.GetValueRefOrAddDefault(name, out var exists);
+            //if (exists) {
+            //    return inputBankRef as T;
+            //} else {
+            //    var inputBank = new T();
+            //    inputBankRef = inputBank;
+            //    return inputBank;
+            //}
+            if (_nameToInputBank.TryGetValue(name, out var inputBank)) {
+                return inputBank as T;
             } else {
-                var inputBank = new T();
-                inputBankRef = inputBank;
-                return inputBank;
+                inputBank = new T();
+                _nameToInputBank[name] = inputBank;
+                return inputBank as T;
             }
         }
     }

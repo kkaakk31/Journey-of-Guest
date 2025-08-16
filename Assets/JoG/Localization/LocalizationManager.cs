@@ -24,12 +24,8 @@ namespace JoG.Localization {
                 : (_table.TryGetValue(key, out var value) ? value : string.Empty);
         }
 
-#if UNITY_EDITOR
-
-        [MenuItem("Tools/Localization/Init")]
-#endif
-        [RuntimeInitializeOnLoadMethod]
-        private static void Load() {
+ 
+        public static void Load() {
             var table = HjsonLoader.LoadLocalization(_currentLanguage);
             if (table is null) {
                 Debug.LogError($"Localization file for language '{_currentLanguage}' not found or invalid.");

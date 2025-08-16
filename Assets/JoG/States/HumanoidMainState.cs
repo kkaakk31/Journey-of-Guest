@@ -26,6 +26,7 @@ namespace JoG.States {
             jumpInput = body.GetInputBank<TriggerInputBank>("Jump");
             interactInput = body.GetInputBank<TriggerInputBank>("Interact");
             sprintInput = body.GetInputBank<BooleanInputBank>("Sprint");
+            model.Animator.logWarnings = false;
         }
 
         protected void OnEnable() {

@@ -1,4 +1,4 @@
-#if NET5_0_OR_GREATER
+#if NET5_0
 // The CollectionsMarshal type is internal in .NET 5.0 and later, so it's not necessary to define it.
 #elif NETSTANDARD2_1
 // The Span<T> and ReadOnlySpan<T> types are internal in .NET Standard 2.1 and later.
@@ -115,7 +115,7 @@ namespace System.Runtime.InteropServices {
         /// <remarks>
         /// When increasing the count, uninitialized data is being exposed.
         /// </remarks>
-        public static void SetCount<T>(this List<T> list, int count) {
+        public static void SetCount<T>(List<T> list, int count) {
             if (count < 0) {
                 throw new ArgumentOutOfRangeException(nameof(count), "Non-negative number required.");
             }
@@ -417,20 +417,25 @@ namespace System.Runtime.InteropServices {
             ref var entries = ref dictionary._entries;
             // Debug.Assert(entries != null, "expected entries to be non-null");
 
-            var comparer = dictionary._comparer;
+            IEqualityComparer<TKey>? comparer = dictionary._comparer;
             // Debug.Assert(comparer is not null || typeof(TKey).IsValueType);
-            uint hashCode = (uint)(comparer != null ? comparer.GetHashCode(key) : key.GetHashCode());
+            var isValueType = typeof(TKey).IsValueType;
+            if (comparer == null && !isValueType) {
+                // If TKey is a value type and the comparer is null, we can use the default equality comparer.
+                // This allows us to devirtualize the call to GetHashCode and Equals.
+                comparer = EqualityComparer<TKey>.Default;
+            }
+            uint hashCode = (uint)(isValueType && comparer == null ? key.GetHashCode() : comparer!.GetHashCode(key));
 
             uint collisionCount = 0;
             ref int bucket = ref DictionaryExtensions.GetBucket(ref dictionary, hashCode);
             int i = bucket - 1; // Value in _buckets is 1-based
 
-            if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+            if (isValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
                 comparer == null) {
                 // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
-                comparer = EqualityComparer<TKey>.Default;
                 while ((uint)i < (uint)entries.Length) {
-                    if (entries[i].hashCode == hashCode && comparer.Equals(entries[i].key, key)) {
+                    if (entries[i].hashCode == hashCode && EqualityComparer<TKey>.Default.Equals(entries[i].key, key)) {
                         exists = true;
 
                         return ref entries[i].value!;
@@ -439,15 +444,14 @@ namespace System.Runtime.InteropServices {
                     i = entries[i].next;
 
                     collisionCount++;
-                    if (collisionCount > entries.Length) {
+                    if (collisionCount > (uint)entries.Length) {
                         // The chain of entries forms a loop; which means a concurrent update has happened.
                         // Break out of the loop and throw, rather than looping forever.
                         throw new InvalidOperationException("Concurrent operations are not supported.");
                     }
                 }
             } else {
-                //Debug.Assert(comparer is not null);
-                comparer ??= EqualityComparer<TKey>.Default;
+                // Debug.Assert(comparer is not null);
                 while ((uint)i < (uint)entries.Length) {
                     if (entries[i].hashCode == hashCode && comparer.Equals(entries[i].key, key)) {
                         exists = true;
@@ -495,7 +499,7 @@ namespace System.Runtime.InteropServices {
             dictionary._version++;
 
             // Value types never rehash
-            if (!typeof(TKey).IsValueType && collisionCount > HashHelpers.HashCollisionThreshold /* && comparer is NonRandomizedStringEqualityComparer */) {
+            if (!isValueType && collisionCount > HashHelpers.HashCollisionThreshold /* && comparer is NonRandomizedStringEqualityComparer */) {
                 // If we hit the collision threshold we'll need to switch to the comparer which is using randomized string hashing
                 // i.e. EqualityComparer<string>.Default.
                 DictionaryExtensions.Resize(ref dictionary, entries.Length, true);

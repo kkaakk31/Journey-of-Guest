@@ -18,6 +18,38 @@
             <param name="rollAngle">翻滚角上的角度</param>
             <returns>扩散后的旋转</returns>
         </member>
+        <member name="M:GuestUnion.StringExtensions.ToColored(System.String,UnityEngine.Color32@)">
+            <summary>转换为带颜色富文本字符串</summary>
+            <param name="str">原始字符串</param>
+            <param name="color">颜色（Color32）</param>
+            <returns>带有 <color></color> 标签的字符串</returns>
+        </member>
+        <member name="M:GuestUnion.StringExtensions.ToBold(System.String)">
+            <summary>转换为加粗富文本字符串</summary>
+            <param name="str">原始字符串</param>
+            <returns>带有 <b></b> 标签的字符串</returns>
+        </member>
+        <member name="M:GuestUnion.StringExtensions.ToItalic(System.String)">
+            <summary>转换为斜体富文本字符串</summary>
+            <param name="str">原始字符串</param>
+            <returns>带有 <i></i> 标签的字符串</returns>
+        </member>
+        <member name="M:GuestUnion.StringExtensions.ToSize(System.String,System.Int32)">
+            <summary>转换为指定字号的富文本字符串</summary>
+            <param name="str">原始字符串</param>
+            <param name="size">字号大小</param>
+            <returns>带有 <size></size> 标签的字符串</returns>
+        </member>
+        <member name="M:GuestUnion.StringExtensions.ToUnderline(System.String)">
+            <summary>转换为带下划线的富文本字符串</summary>
+            <param name="str">原始字符串</param>
+            <returns>带有 <u></u> 标签的字符串</returns>
+        </member>
+        <member name="M:GuestUnion.StringExtensions.ToStrikethrough(System.String)">
+            <summary>转换为带删除线的富文本字符串</summary>
+            <param name="str">原始字符串</param>
+            <returns>带有 <s></s> 标签的字符串</returns>
+        </member>
         <member name="M:GuestUnion.Vector3Extensions.Sum(UnityEngine.Vector3@)">
             <summary>x+y+z</summary>
             <returns>x+y+z</returns>

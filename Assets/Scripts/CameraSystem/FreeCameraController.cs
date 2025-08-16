@@ -1,6 +1,8 @@
 using EditorAttributes;
+using Google.Protobuf.Collections;
 using GuestUnion;
 using JoG.Character.InputBanks;
+using JoG.DebugExtensions;
 using JoG.Messages;
 using MessagePipe;
 using System;
@@ -56,8 +58,9 @@ namespace JoG.CameraSystem {
         }
 
         private void Update() {
-            AimOrigin = ThirdPersonCamera.State.GetFinalPosition();
-            AimVector3 = ThirdPersonCamera.State.GetFinalOrientation() * Vector3.forward;
+            var state = ThirdPersonCamera.State;
+            AimOrigin = state.GetFinalPosition();
+            AimVector3 = state.GetFinalOrientation() * Vector3.forward;
             if (Physics.Raycast(AimOrigin, AimVector3, out var hit, 1000, aimCollisionFilter, QueryTriggerInteraction.Ignore)) {
                 AimPosition = hit.point;
                 AimObject = hit.collider.gameObject;
