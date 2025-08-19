@@ -1,25 +1,28 @@
+using ANU.IngameDebug.Console;
+using EditorAttributes;
 using UnityEngine;
 using UnityUtils;
 
 namespace JoG {
 
+    [DebugCommandPrefix("cursor")]
     public class CursorManager : Singleton<CursorManager> {
-        protected int _showRequestCount = 1;
+        [SerializeField, ReadOnly] protected int _showCursorCount = 1;
 
-        /// <summary>请求显示鼠标（可多次叠加）</summary>
-        public void RequestShowCursor() {
-            _showRequestCount++;
+        [DebugCommand]
+        public void ShowCursor() {
+            _showCursorCount++;
             UpdateCursorState();
         }
 
-        /// <summary>取消显示鼠标的请求</summary>
-        public void ReleaseShowCursor() {
-            _showRequestCount--;
+        [DebugCommand]
+        public void HideCursor() {
+            _showCursorCount--;
             UpdateCursorState();
         }
 
         protected void UpdateCursorState() {
-            if (_showRequestCount > 0) {
+            if (_showCursorCount > 0) {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             } else {

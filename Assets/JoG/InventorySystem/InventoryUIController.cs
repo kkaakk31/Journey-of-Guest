@@ -83,8 +83,8 @@ namespace JoG.InventorySystem {
         private void OnDisable() {
             if (tablePanel.activeSelf) {
                 tablePanel.SetActive(false);
-                PlayerCharacterInputer.Instance.RequestEnableInput();
-                CursorManager.Instance.ReleaseShowCursor();
+                CharacterInputManager.Instance.EnableInput();
+                CursorManager.Instance.HideCursor();
             }
             inventoryRoot.SetActive(false);
             _uiToggle.action.Disable();
@@ -94,12 +94,12 @@ namespace JoG.InventorySystem {
         private void OnUIToggle(InputAction.CallbackContext callback) {
             if (tablePanel.activeSelf) {
                 tablePanel.SetActive(false);
-                PlayerCharacterInputer.Instance.RequestEnableInput();
-                CursorManager.Instance.ReleaseShowCursor();
+                CharacterInputManager.Instance.EnableInput();
+                CursorManager.Instance.HideCursor();
             } else {
                 tablePanel.SetActive(true);
-                PlayerCharacterInputer.Instance.ReleaseEnableInput();
-                CursorManager.Instance.RequestShowCursor();
+                CharacterInputManager.Instance.DisableInput();
+                CursorManager.Instance.ShowCursor();
             }
         }
     }

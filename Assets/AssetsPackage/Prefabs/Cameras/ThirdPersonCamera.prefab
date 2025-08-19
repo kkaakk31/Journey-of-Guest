@@ -41,7 +41,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8152383675614384375}
   - component: {fileID: 1240021412465648058}
-  - component: {fileID: 1011338558689522108}
   m_Layer: 0
   m_Name: ThirdPersonCamera
   m_TagString: Untagged
@@ -78,20 +77,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21b1c11b80081e24c8c7263d381eb460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aimCollisionFilter:
+    serializedVersion: 2
+    m_Bits: 385
   <ThirdPersonCamera>k__BackingField: {fileID: 4499010949813336932}
-  <ThirdPersonAim>k__BackingField: {fileID: 2387964947718346967}
---- !u!114 &1011338558689522108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6735623091450806371}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 902f8a465e6b1b148a86011d80232358, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8250658295219809102
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,7 +191,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8250658295219809102}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2588cc5dedbb75e49a44aada63f7b939, type: 3}
   m_Name: 

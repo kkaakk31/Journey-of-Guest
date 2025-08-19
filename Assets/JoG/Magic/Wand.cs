@@ -14,7 +14,7 @@ namespace JoG.Magic {
         public uint manaCapacity = 100;
         [NonSerialized] public float value;
         [Range(1, float.MaxValue)] public float chargingSpeed;
-        [Clamp(0.02f, 50f)] public float cooldown = 1f;
+        [Range(0.02f, 50f)] public float cooldown = 1f;
         public Vector2 maxSpread;
         private float _lastCastTime;
         private NetworkVariable<NetworkObjectReference> _ownerReference = new();

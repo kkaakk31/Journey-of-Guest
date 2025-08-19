@@ -20,7 +20,7 @@ namespace JoG.Weapons {
     public class Gun : NetworkBehaviour, IGun, IInteractable, IItem {
         public const float MAX_PASSED_TIME = 0.3f;
         public FireMode fireMode;
-        [DataTable(showLabels: false)] public Magazine magazine = new(30);
+        public Magazine magazine = new(30);
 
         private readonly NetworkVariable<NetworkBehaviourReference> ownerBody = new();
 

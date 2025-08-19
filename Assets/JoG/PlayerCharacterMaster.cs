@@ -1,21 +1,22 @@
 ﻿using JoG.Character;
-using JoG.Messages;
+using JoG.UI;
+using JoG.UI.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using VContainer.Unity;
 
 namespace JoG {
 
     [DisallowMultipleComponent]
     public class PlayerCharacterMaster : CharacterMaster {
-        public GameObject topUIPrefab;
         private static readonly List<PlayerCharacterMaster> _players = new();
         private readonly NetworkVariable<FixedString32Bytes> _playerName = new(writePerm: NetworkVariableWritePermission.Owner);
         public static ReadOnlySpan<PlayerCharacterMaster> Players => _players.AsSpan();
+        [field: SerializeField] public CharacterNameplate Nameplate { get; private set; }
+        [field: SerializeField] public CharacterViewController ViewController { get; private set; }
 
         /// <summary>Write: Owner Only.</summary>
         public string PlayerName {
@@ -34,21 +35,44 @@ namespace JoG {
             return false;
         }
 
+        public void SpawnBody(NetworkObject bodyPrefab, in Vector3 position, in Quaternion rotation) {
+            if (Body != null) {
+                Debug.LogWarning("Player already has a body. Cannot spawn another one.");
+                return;
+            }
+            var nob = NetworkManager.SpawnManager.InstantiateAndSpawn(
+                bodyPrefab,
+                destroyWithScene: true,
+                isPlayerObject: true,
+                position: position,
+                rotation: rotation
+            );
+            if (nob == null || nob.TrySetParent(NetworkObject, true)) {
+                return;
+            }
+            nob.Despawn();
+        }
+
         public override void OnNetworkSpawn() {
             base.OnNetworkSpawn();
             _players.Add(this);
-            if (!IsLocalPlayer) {
-                var go = Instantiate(topUIPrefab, transform);
-                GetComponent<LifetimeScope>().Container.InjectGameObject(go);
-            }
+            ViewController.enabled = !IsLocalPlayer;
         }
 
         public override void OnNetworkDespawn() {
             base.OnNetworkDespawn();
             _players.Remove(this);
+            ViewController.enabled = false;
         }
 
-        protected override void OnBodyChanged(in CharacterBodyChangedMessage message) {
+        protected void Awake() {
+            _playerName.OnValueChanged = (oldValue, newValue) => {
+                Nameplate.NameplateText = newValue.ToString();
+            };
+        }
+
+        protected override void OnNetworkSessionSynchronized() {
+            Nameplate.NameplateText = PlayerName;
         }
     }
 }

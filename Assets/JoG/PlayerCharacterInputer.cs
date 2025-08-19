@@ -16,7 +16,7 @@ namespace JoG {
         private TriggerInputBank secondaryActionInputBank;
         private TriggerInputBank skillInputBank;
         private Vector3InputBank moveInputBank;
-        private InputActionMap _commonCharacterActionMap;
+        private InputActionMap _characterActionMap;
         private InputAction _move;
         private InputAction _primaryAction;
         private InputAction _secondaryAction;
@@ -24,23 +24,12 @@ namespace JoG {
         private InputAction _sprint;
         private InputAction _skill;
         private InputAction _interact;
-        private IDisposable _characterBodyChangedMessageDisposable;
+        private IDisposable _disposable;
         private int _enableInputCount;
-        public static PlayerCharacterInputer Instance { get; private set; }
 
         void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
             var body = message.body;
-            if (message.changeType is CharacterBodyChangeType.Lose && body.IsLocalPlayer) {
-                interactInputBank = null;
-                jumpInputBank = null;
-                moveInputBank = null;
-                primaryActionInputBank = null;
-                secondaryActionInputBank = null;
-                skillInputBank = null;
-                sprintInputBank = null;
-                UnregisterCallback();
-                ReleaseEnableInput();
-            } else if (message.changeType is CharacterBodyChangeType.Get && body.IsLocalPlayer) {
+            if (message.changeType is CharacterBodyChangeType.Get) {
                 interactInputBank = body.GetInputBank<TriggerInputBank>("Interact");
                 jumpInputBank = body.GetInputBank<TriggerInputBank>("Jump");
                 moveInputBank = body.GetInputBank<Vector3InputBank>("Move");
@@ -49,49 +38,38 @@ namespace JoG {
                 skillInputBank = body.GetInputBank<TriggerInputBank>("Skill");
                 sprintInputBank = body.GetInputBank<BooleanInputBank>("Sprint");
                 RegisterCallback();
-                RequestEnableInput();
-            }
-        }
-
-        public void RequestEnableInput() {
-            _enableInputCount++;
-            UpdateInputState();
-        }
-
-        public void ReleaseEnableInput() {
-            _enableInputCount--;
-            UpdateInputState();
-        }
-
-        private void UpdateInputState() {
-            if (_enableInputCount > 0) {
-                _commonCharacterActionMap?.Enable();
-            } else {
-                _commonCharacterActionMap?.Disable();
+                CharacterInputManager.Instance.EnableInput();
+                CursorManager.Instance.HideCursor();
+            } else if (message.changeType is CharacterBodyChangeType.Lose) {
+                interactInputBank = null;
+                jumpInputBank = null;
+                moveInputBank = null;
+                primaryActionInputBank = null;
+                secondaryActionInputBank = null;
+                skillInputBank = null;
+                sprintInputBank = null;
+                UnregisterCallback();
+                CharacterInputManager.Instance.DisableInput();
+                CursorManager.Instance.ShowCursor();
             }
         }
 
         [Inject]
         private void Construct(InputActionAsset inputActionAsset, IBufferedSubscriber<CharacterBodyChangedMessage> subscriber) {
-            _commonCharacterActionMap = inputActionAsset.FindActionMap("CommonCharacterActionMap", true);
-            _move = _commonCharacterActionMap.FindAction("Move", true);
-            _primaryAction = _commonCharacterActionMap.FindAction("PrimaryAction", true);
-            _secondaryAction = _commonCharacterActionMap.FindAction("SecondaryAction", true);
-            _jump = _commonCharacterActionMap.FindAction("Jump", true);
-            _sprint = _commonCharacterActionMap.FindAction("Sprint", true);
-            _skill = _commonCharacterActionMap.FindAction("Skill", true);
-            _interact = _commonCharacterActionMap.FindAction("Interact", true);
-            _characterBodyChangedMessageDisposable = subscriber.Subscribe(this);
-        }
-
-        private void Awake() {
-            Instance = this;
+            _characterActionMap = inputActionAsset.FindActionMap("Character", true);
+            _move = _characterActionMap.FindAction("Move", true);
+            _primaryAction = _characterActionMap.FindAction("PrimaryAction", true);
+            _secondaryAction = _characterActionMap.FindAction("SecondaryAction", true);
+            _jump = _characterActionMap.FindAction("Jump", true);
+            _sprint = _characterActionMap.FindAction("Sprint", true);
+            _skill = _characterActionMap.FindAction("Skill", true);
+            _interact = _characterActionMap.FindAction("Interact", true);
+            _disposable = subscriber.Subscribe(this);
         }
 
         private void OnDestroy() {
-            _commonCharacterActionMap?.Disable();
-            _characterBodyChangedMessageDisposable?.Dispose();
-            Instance = null;
+            _characterActionMap?.Disable();
+            _disposable?.Dispose();
         }
 
         private void RegisterCallback() {

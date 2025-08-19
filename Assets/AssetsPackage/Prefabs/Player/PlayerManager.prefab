@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3484807886
+  GlobalObjectIdHash: 3649680538
   InScenePlacedSourceGlobalObjectIdHash: 3649680538
   DeferredDespawnTick: 0
   Ownership: 1
@@ -73,6 +73,10 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   networkPlayerPrefab: {fileID: 5105298387205477994, guid: f12fb2dc40d045945b40496a853fb82b,
     type: 3}
-  characterPrefab: {fileID: 7666835029132873609, guid: b2d1cd974b0279c419e1be8586b3d720,
+  defaultBodyPrefab: {fileID: 6816064005894051681, guid: 4d452fb401bb5fd43aef8215b8bb75af,
     type: 3}
   _autoInjectObjects: []
+  _spawnPoints:
+    _isUseEachItemOncePerCycle: 0
+    _isEqualWeightForAllItems: 0
+    _selectableValues: []

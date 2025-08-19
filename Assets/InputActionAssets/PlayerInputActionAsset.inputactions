@@ -2,7 +2,7 @@
     "name": "PlayerInputActionAsset",
     "maps": [
         {
-            "name": "CommonCharacterActionMap",
+            "name": "Character",
             "id": "1c8f21b1-707f-412c-8d33-c7a1098eadf2",
             "actions": [
                 {
@@ -554,7 +554,7 @@
             ]
         },
         {
-            "name": "MenuActionMap",
+            "name": "Menu",
             "id": "8ed6872b-6f3c-466a-acf6-8d5b53fe1331",
             "actions": [
                 {
@@ -647,7 +647,7 @@
                     "name": "Cancel",
                     "type": "Button",
                     "id": "c0af9aca-d4c1-42c0-b738-a84c02b1f81a",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
