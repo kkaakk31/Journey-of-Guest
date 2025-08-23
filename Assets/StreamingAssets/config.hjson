@@ -7,6 +7,9 @@
         potion: {
             tickInterval: 0.25,
             damage: 10
+        },
+        burning:{
+            tickInterval: 0.2,
         }
     },
     item: {

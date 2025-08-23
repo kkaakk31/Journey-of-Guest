@@ -1,9 +1,9 @@
-﻿using Unity.Netcode;
-
-namespace JoG {
+﻿namespace JoG {
 
     public interface IHealable {
 
-        void Handle(HealingMessage message);
+        void AddHealing(HealingMessage message);
+
+        void SubmitHealing();
     }
 }

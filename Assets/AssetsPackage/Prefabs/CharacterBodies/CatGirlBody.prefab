@@ -70,6 +70,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 1
   healingCofficient: 1.25
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &381714341729732202
 GameObject:
   m_ObjectHideFlags: 0
@@ -140,6 +143,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 0.25
   healingCofficient: 0.25
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &681815670190873982
 GameObject:
   m_ObjectHideFlags: 0
@@ -222,7 +228,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   _model: {fileID: 1099096398687094651}
   _aimOriginTransform: {fileID: 5602668462855563335}
-  _maxHPBase: 100
+  _maxHPBase: 1000
 --- !u!114 &2332138035323811946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -385,6 +391,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 0.5
   healingCofficient: 0.5
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &1142561870245014868
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,6 +462,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 1.25
   healingCofficient: 1
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &2464413621918833767
 GameObject:
   m_ObjectHideFlags: 0
@@ -568,6 +580,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 0.25
   healingCofficient: 0.25
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &2649420926643528220
 GameObject:
   m_ObjectHideFlags: 0
@@ -684,6 +699,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 0.5
   healingCofficient: 0.5
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &2732456302790452501
 GameObject:
   m_ObjectHideFlags: 0
@@ -754,6 +772,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 0.25
   healingCofficient: 0.25
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &3963387483435787187
 GameObject:
   m_ObjectHideFlags: 0
@@ -980,6 +1001,7 @@ GameObject:
   - component: {fileID: 9063947961052601354}
   - component: {fileID: 1099096398687094651}
   - component: {fileID: 4945152005701765089}
+  - component: {fileID: 7894206860852681813}
   m_Layer: 6
   m_Name: Model
   m_TagString: Untagged
@@ -1163,13 +1185,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8da125b7fe18e864187baa015f714197, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hasValue: 0
+  hasDamage: 0
   damageMessage:
     value: 0
     cofficient: 0
     position: {x: 0, y: 0, z: 0}
     impulse: {x: 0, y: 0, z: 0}
     flags: 0
+  hasHealing: 0
+  healingMessage:
+    value: 0
+    cofficient: 0
+    flags: 0
+  _body: {fileID: 2297808037990051093}
+--- !u!114 &7894206860852681813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7730539439455128377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 895d1e110e69719438bbc109108c4df0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageCofficient: 0.2
+  damageCount: 5
+  _processor: {fileID: 4945152005701765089}
 --- !u!1 &7782441815850036851
 GameObject:
   m_ObjectHideFlags: 0
@@ -1240,6 +1283,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 0.5
   healingCofficient: 0.5
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &8284892803328835579
 GameObject:
   m_ObjectHideFlags: 0
@@ -1310,6 +1356,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 0.25
   healingCofficient: 0.25
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1 &8503595237324239669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1380,6 +1429,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 0.5
   healingCofficient: 0.5
+  <Processor>k__BackingField: {fileID: 4945152005701765089}
+  <Handlers>k__BackingField:
+  - {fileID: 7894206860852681813}
 --- !u!1001 &1364394229971940372
 PrefabInstance:
   m_ObjectHideFlags: 0

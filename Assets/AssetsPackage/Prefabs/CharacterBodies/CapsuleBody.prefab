@@ -123,6 +123,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 1.5
   healingCofficient: 1
+  <Processor>k__BackingField: {fileID: 384310902087081202}
+  <Handlers>k__BackingField:
+  - {fileID: 1210569498830411247}
 --- !u!1 &500260529379414277
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,6 +298,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageCofficient: 1
   healingCofficient: 1
+  <Processor>k__BackingField: {fileID: 384310902087081202}
+  <Handlers>k__BackingField:
+  - {fileID: 1210569498830411247}
 --- !u!1 &1677510096776499015
 GameObject:
   m_ObjectHideFlags: 0
@@ -613,6 +619,7 @@ GameObject:
   - component: {fileID: 1442361480306615596}
   - component: {fileID: 7870270323345327983}
   - component: {fileID: 384310902087081202}
+  - component: {fileID: 1210569498830411247}
   m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
@@ -692,13 +699,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8da125b7fe18e864187baa015f714197, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hasValue: 0
+  hasDamage: 0
   damageMessage:
     value: 0
     cofficient: 0
     position: {x: 0, y: 0, z: 0}
     impulse: {x: 0, y: 0, z: 0}
     flags: 0
+  hasHealing: 0
+  healingMessage:
+    value: 0
+    cofficient: 0
+    flags: 0
+  _body: {fileID: 1367351897065705305}
+--- !u!114 &1210569498830411247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5940989735750854457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 895d1e110e69719438bbc109108c4df0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageCofficient: 0.2
+  damageCount: 5
+  _processor: {fileID: 384310902087081202}
 --- !u!1 &6723167559438788363
 GameObject:
   m_ObjectHideFlags: 0
@@ -911,7 +939,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   _model: {fileID: 7870270323345327983}
   _aimOriginTransform: {fileID: 4440793574485330580}
-  _maxHPBase: 100
+  _maxHPBase: 1000
 --- !u!114 &4392522684828096243
 MonoBehaviour:
   m_ObjectHideFlags: 0

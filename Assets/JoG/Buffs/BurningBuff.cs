@@ -7,25 +7,25 @@ using YooAsset;
 
 namespace JoG.Buffs {
 
-    public sealed class BleedingBuff : TickableBuff<BleedingBuff> {
+    public sealed class BurningBuff : TickableBuff<BurningBuff> {
 
-        [FromConfig("buff.bleeding.tickInterval")]
+        [FromConfig("buff.burning.tickInterval")]
         public static float tickInterval;
 
         public NetworkObjectReference attacker;
         public uint damageValuePerTick;
         public ushort damageCount;
 
-        [FromAsset("BleedingSprite")]
+        [FromAsset("BurningSprite")]
         private static AssetHandle iconSprite;
 
         public uint TotalDamage => damageValuePerTick * damageCount;
 
         public override Sprite IconSprite => iconSprite.GetAssetObject<Sprite>();
 
-        public override string Name => Localizer.GetString("buff.bleeding.name");
+        public override string Name => Localizer.GetString("buff.burning.name");
 
-        public override string Description => Localizer.GetString("buff.bleeding.desc");
+        public override string Description => Localizer.GetString("buff.burning.desc");
 
         public override float TickInterval => tickInterval;
 
@@ -45,7 +45,7 @@ namespace JoG.Buffs {
             reader.ReadNetworkSerializable(out attacker);
         }
 
-        protected override void MergeWith(BleedingBuff buff) {
+        protected override void MergeWith(BurningBuff buff) {
             damageCount += buff.damageCount;
         }
 
@@ -58,7 +58,7 @@ namespace JoG.Buffs {
                 Owner.Handle(new DamageMessage {
                     value = damageValuePerTick,
                     cofficient = 1,
-                    flags = DamgeFlag.bleeding,
+                    flags = DamgeFlag.fire,
                     attacker = attacker,
                     position = Owner.Center,
                 });

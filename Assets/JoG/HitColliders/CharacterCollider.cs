@@ -1,3 +1,8 @@
+using EditorAttributes;
+using GuestUnion.ObjectPool.Generic;
+using JoG.HealthMessageHandlers;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace JoG.HitColliders {
@@ -5,28 +10,38 @@ namespace JoG.HitColliders {
     [RequireComponent(typeof(Collider))]
     [DisallowMultipleComponent]
     public class CharacterCollider : MonoBehaviour, IDamageable, IHealable {
-        public float damageCofficient = 1f;
-        public float healingCofficient = 1f;
-        public IHealth Health { get; private set; }
-        public DamageMessageHandler DamageMessageHandler { get; private set; }
+        [Clamp(0.001f, 1000)] public float damageCofficient = 1f;
+        [Clamp(0.001f, 1000)] public float healingCofficient = 1f;
+        [field: SerializeField, Required] public HealthMessageProcessor Processor { get; private set; }
+        [field: SerializeField] public List<DamageMessageHandler> Handlers { get; private set; }
 
-        public void Handle(HealingMessage message) {
+        public void AddHealing(HealingMessage message) {
             message.value = (uint)(message.value * damageCofficient);
-            Health.Handle(message);
+            Processor.AddHealing(message);
         }
 
         public void AddDamage(DamageMessage message) {
             message.value = (uint)(message.value * healingCofficient);
-            DamageMessageHandler.AddDamage(message);
+            foreach (var handler in Handlers.AsSpan()) {
+                handler.Handle(message);
+            }
+            Processor.AddDamage(message);
         }
 
         public void SubmitDamage() {
-            DamageMessageHandler.Submit();
+            Processor.SubmitDamage();
+        }
+
+        public void SubmitHealing() {
+            Processor.SubmitDamage();
         }
 
         protected void Awake() {
-            Health = GetComponentInParent<IHealth>();
-            DamageMessageHandler = GetComponentInParent<DamageMessageHandler>();
+            Handlers ??= new();
+        }
+
+        protected void Reset() {
+            Processor = GetComponentInParent<HealthMessageProcessor>();
         }
     }
 }

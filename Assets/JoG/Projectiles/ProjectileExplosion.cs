@@ -1,6 +1,5 @@
 ﻿using GuestUnion;
 using GuestUnion.ObjectPool.Generic;
-using JoG.DebugExtensions;
 using System.Buffers;
 using System.Runtime.InteropServices;
 using Unity.Netcode;
@@ -16,7 +15,7 @@ namespace JoG.Projectiles {
         public LayerMask damageLayer;
         public NetworkObject explosionEffectPrefab;
         private ProjectileData _data;
-        private DamageMessage damageMessage;
+        private DamageMessage damageMessage; 
 
         public void Handle(in ProjectileHitMessage message) {
             if (_data.HasAuthority) {

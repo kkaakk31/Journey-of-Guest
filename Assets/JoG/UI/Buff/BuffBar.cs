@@ -20,9 +20,10 @@ namespace JoG.UI.Buff {
             var icons = _icons.AsSpan();
             var index = 0;
             foreach (var buff in source) {
-                if (buff is null || buff.IconSprite is null) continue;
-                icons[index].UpdateView(source[index]);
-                ++index;
+                if (buff is not null) {
+                    icons[index].UpdateView(buff);
+                    ++index;
+                }
             }
             index = _icons.Count;
             while (index > activeBuffCount) {

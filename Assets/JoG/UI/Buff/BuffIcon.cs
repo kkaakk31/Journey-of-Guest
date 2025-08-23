@@ -1,5 +1,6 @@
 using EditorAttributes;
 using JoG.BuffSystem;
+using JoG.DebugExtensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
