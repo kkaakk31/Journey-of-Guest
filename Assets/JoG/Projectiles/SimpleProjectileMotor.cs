@@ -18,7 +18,7 @@ namespace JoG.Projectiles {
 
         public LayerMask hitLayer;
 
-        [Tooltip("ÍøÂçÑÓ³Ù[network delay]")]
+        [Tooltip("network delay")]
         protected float passedTime;
 
         private float _deadtime;
@@ -48,7 +48,7 @@ namespace JoG.Projectiles {
                     return;
                 }
                 if (Physics.SphereCast(position, radius, forward, out var hitInfo, distance, hitLayer, QueryTriggerInteraction.Collide)) {
-                    _messageHandler.Handle(new(hitInfo));
+                    _messageHandler.Handle(hitInfo);
                     NetworkObject.DeferDespawn(4);
                     return;
                 }

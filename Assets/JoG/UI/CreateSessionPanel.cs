@@ -27,7 +27,7 @@ namespace JoG.UI {
         }
 
         private async void CreateSession() {
-            var result = await LoadingPanelManager.Loading(
+            var result = await LoadingManager.Loading(
                 _sessionManager.CreateSessionAsync(
                     SessionNameInputField.text,
                     PasswordInputField.text,

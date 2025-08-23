@@ -1,31 +1,18 @@
-﻿using QuickOutline;
+﻿using JoG.Localization;
 using Unity.Netcode;
-using UnityEngine;
 
 namespace JoG.InteractionSystem {
 
-    [RequireComponent(typeof(Outline))]
-    [RequireComponent(typeof(Collider))]
-    public abstract class InteractableObject : NetworkBehaviour, IInteractable, IInfomationProvider {
-        public Color outlineColor = Color.white;
-        private Outline _outline;
+    public abstract class InteractableObject : NetworkBehaviour, IInteractable, IInformationProvider {
+        public LocalizableString localizableName;
+        public LocalizableString localizableDescription;
+        public string Name => localizableName.Value;
+        public string Description => localizableDescription.Value;
 
-        public abstract string GetString(string token);
+        public string GetProperty(string token) => Localizer.GetString(token);
 
         public abstract Interactability GetInteractability(Interactor interactor);
 
         public abstract void PreformInteraction(Interactor interactor);
-
-        protected virtual void Awake() {
-            _outline = GetComponent<Outline>();
-        }
-
-        protected virtual void OnEnable() {
-            _outline.OutlineColor = outlineColor;
-        }
-
-        protected virtual void OnDisable() {
-            _outline.OutlineColor = Color.gray;
-        }
     }
 }

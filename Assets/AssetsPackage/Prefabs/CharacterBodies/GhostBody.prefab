@@ -508,7 +508,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   _model: {fileID: 6956782959817507022}
   _aimOriginTransform: {fileID: 6554222600300004472}
-  _aimTargetTransform: {fileID: 8584806178611381104}
   _maxHPBase: 1000
 --- !u!114 &5467945959758500579
 MonoBehaviour:
@@ -525,7 +524,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   interactiveLayer:
     serializedVersion: 2
-    m_Bits: 265
+    m_Bits: 2305
   maxDistance: 3
 --- !u!1 &8774618703304511867
 GameObject:

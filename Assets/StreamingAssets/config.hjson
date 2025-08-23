@@ -13,5 +13,14 @@
         potion: {
             heal: 20
         }
+    },
+    spell:{
+        fireball: {
+            damage: 20
+        },
+        frostbolt: {
+            damage: 15
+        },
+
     }
 }

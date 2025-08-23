@@ -25,7 +25,7 @@ namespace JoG.UI.Managers {
         protected async void Awake() {
             _networkManager.OnClientStarted += LoadLobbyScene;
             if (_authenticationService.IsSignedIn) return;
-            await LoadingPanelManager.Loading(_authenticationService.SignInAnonymouslyAsync(), "正在登录...");
+            await LoadingManager.Loading(_authenticationService.SignInAnonymouslyAsync(), "正在登录...");
         }
 
         protected void OnDestroy() {

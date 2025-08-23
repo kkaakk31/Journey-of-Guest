@@ -43,7 +43,7 @@ namespace JoG.InteractionSystem {
         }
 
         protected void Reset() {
-            interactiveLayer = LayerMask.GetMask("Default", "Trigger", "Item");
+            interactiveLayer = LayerMask.GetMask("Default", "Interactable" );
         }
     }
 }

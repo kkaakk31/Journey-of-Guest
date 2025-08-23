@@ -1,6 +1,8 @@
-﻿using JoG.DebugExtensions;
+﻿using EditorAttributes;
+using JoG.DebugExtensions;
 using JoG.Messages;
 using RandomElementsSystem.Types;
+using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -51,7 +53,9 @@ namespace JoG.Character {
         public override void OnBodyChanged(in CharacterBodyChangedMessage message) {
             base.OnBodyChanged(message);
             if (NetworkManager.ShutdownInProgress) return;
-            if (message.changeType is CharacterBodyChangeType.Lose) {
+            if (message.changeType is CharacterBodyChangeType.Get) {
+                message.body.tag = tag;
+            } else if (message.changeType is CharacterBodyChangeType.Lose) {
                 if (lifeCount > 0) {
                     if (--lifeCount == 0) {
                         this.Log("Enemy has no more lives. Despawning.");

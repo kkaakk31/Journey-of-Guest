@@ -23,9 +23,9 @@ namespace JoG.Buffs {
 
         public override Sprite IconSprite => iconSprite.GetAssetObject<Sprite>();
 
-        public override string Name => LocalizationManager.GetString("buff.bleeding.name");
+        public override string Name => Localizer.GetString("buff.bleeding.name");
 
-        public override string Description => LocalizationManager.GetString("buff.bleeding.desc");
+        public override string Description => Localizer.GetString("buff.bleeding.desc");
 
         public override float TickInterval => tickInterval;
 

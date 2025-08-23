@@ -1,12 +1,23 @@
 ﻿using JoG.Character;
+using JoG.DebugExtensions;
 using JoG.InteractionSystem;
+using JoG.Localization;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace JoG.Assets.JoG.Character {
 
-    public class CharacterSelectable : MonoBehaviour, IInteractable {
+    public class CharacterSelectable : MonoBehaviour, IInteractable, IInformationProvider {
+        public LocalizableString localizableName;
+        public LocalizableString localizableDescription;
         [SerializeField] private NetworkObject bodyPrefab;
+        public string Name => localizableName.Value;
+
+        public string Description => localizableDescription.Value;
+
+        public string GetProperty(string key) {
+            return Localizer.GetString(key);
+        }
 
         Interactability IInteractable.GetInteractability(Interactor interactor) {
             return interactor.TryGetComponent<CharacterBody>(out _)
@@ -25,7 +36,7 @@ namespace JoG.Assets.JoG.Character {
                      rotation: rotation);
                 newBody.TrySetParent(master, true);
             } else {
-                Debug.LogWarning("Interactor does not have a CharacterBody component.");
+                this.LogWarning("Interactor does not have a CharacterBody component.");
             }
         }
     }

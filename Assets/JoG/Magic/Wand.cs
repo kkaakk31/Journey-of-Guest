@@ -1,7 +1,6 @@
-﻿using EditorAttributes;
-using GuestUnion;
+﻿using GuestUnion;
 using JoG.Character;
-using JoG.InteractionSystem;
+using JoG.Localization;
 using System;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,9 +8,11 @@ using URandom = UnityEngine.Random;
 
 namespace JoG.Magic {
 
-    public class Wand : NetworkBehaviour, IInteractable, IInfomationProvider {
+    public class Wand : NetworkBehaviour, IInformationProvider {
         public Spell spell;
         public uint manaCapacity = 100;
+        public LocalizableString localizableName;
+        public LocalizableString localizableDescription;
         [NonSerialized] public float value;
         [Range(1, float.MaxValue)] public float chargingSpeed;
         [Range(0.02f, 50f)] public float cooldown = 1f;
@@ -27,6 +28,12 @@ namespace JoG.Magic {
         [field: SerializeField] public AudioSource AudioSource { get; private set; }
         public Vector2 CurrentRandomSpread => URandom.insideUnitCircle * maxSpread;
 
+        public string Name => localizableName.Value;
+
+        public string Description => localizableDescription.Value;
+
+        public string GetProperty(string token) => string.Empty;
+
         public virtual void Cast(CharacterBody caster) {
             if (spell.manaCost > value || (Time.time - _lastCastTime) < cooldown) return;
             value -= spell.manaCost;
@@ -37,23 +44,6 @@ namespace JoG.Magic {
                 AudioSource.PlayOneShot(spell.spellClip);
             }
             _lastCastTime = Time.time;
-        }
-
-        string IInfomationProvider.GetString(string token) {
-            if (token is "name") {
-                return "火球杖";
-            }
-            if (token is "description") {
-                return "发射火球";
-            }
-            return null;
-        }
-
-        Interactability IInteractable.GetInteractability(Interactor interactor) {
-            return _ownerReference.Value.TryGet(out _) ? Interactability.Disabled : Interactability.Available;
-        }
-
-        void IInteractable.PreformInteraction(Interactor interactor) {
         }
 
         private void Update() {

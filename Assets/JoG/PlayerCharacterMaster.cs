@@ -1,4 +1,5 @@
 ﻿using JoG.Character;
+using JoG.Messages;
 using JoG.UI;
 using JoG.UI.Controllers;
 using System;
@@ -63,6 +64,13 @@ namespace JoG {
             base.OnNetworkDespawn();
             _players.Remove(this);
             ViewController.enabled = false;
+        }
+
+        public override void OnBodyChanged(in CharacterBodyChangedMessage message) {
+            base.OnBodyChanged(message);
+            if (message.changeType is CharacterBodyChangeType.Get) {
+                message.body.tag = tag;
+            }
         }
 
         protected void Awake() {

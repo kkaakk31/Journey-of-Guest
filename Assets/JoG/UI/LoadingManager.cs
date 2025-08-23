@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace JoG.UI {
 
-    public class LoadingPanelManager : MonoBehaviour {
-        private static LoadingPanelManager _instance;
+    public class LoadingManager : MonoBehaviour {
+        private static LoadingManager _instance;
 
         [SerializeField, Required] private GameObject _panel;
         [SerializeField, Required] private Transform _loadingImageTransform;
@@ -17,7 +17,7 @@ namespace JoG.UI {
 
         private float _loadingTime;
 
-        public static async UniTask<T> Loading<T>(UniTask<T> task,string message = "加载中······") {
+        public static async UniTask<T> Loading<T>(UniTask<T> task, string message = "加载中······") {
             if (_instance) {
                 _instance.Show(message);
             }

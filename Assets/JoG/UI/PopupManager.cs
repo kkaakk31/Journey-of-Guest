@@ -2,6 +2,7 @@
 using DG.Tweening;
 using EditorAttributes;
 using JoG.DebugExtensions;
+using JoG.Localization;
 using System;
 using TMPro;
 using UnityEngine;
@@ -17,10 +18,11 @@ namespace JoG.UI {
         private Action _confirmAction;
         private Action _cancelAction;
 
+        private TMP_Text _confirmButtonText;
+        private TMP_Text _cancelButtonText;
         [field: SerializeField, Required] public TMP_Text MessageText { get; private set; }
 
         [field: SerializeField, Required] public Button ConfirmButton { get; private set; }
-
         [field: SerializeField, Required] public Button CancelButton { get; private set; }
 
         public static void PopupConfirm(string message = "是否确认？", Action confirmAction = null, Action cancelAction = null) {
@@ -63,6 +65,8 @@ namespace JoG.UI {
 
         public void Show(string message = "是否确认？", Action confirmAction = null, Action cancelAction = null) {
             MessageText.text = message;
+            _confirmButtonText.text = Localizer.GetString("message.confirm");
+            _cancelButtonText.text = Localizer.GetString("message.cancel");
             _confirmAction = confirmAction;
             _cancelAction = cancelAction;
             _backgroundGraphic.CrossFadeAlpha(0, 0, false);
@@ -96,6 +100,8 @@ namespace JoG.UI {
                 Hide();
             });
             _popup.SetActive(false);
+            _confirmButtonText = ConfirmButton.GetComponentInChildren<TMP_Text>();
+            _cancelButtonText = CancelButton.GetComponentInChildren<TMP_Text>();
         }
 
         private void OnDestroy() {

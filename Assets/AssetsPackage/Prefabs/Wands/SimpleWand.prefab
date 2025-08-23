@@ -11,8 +11,7 @@ GameObject:
   - component: {fileID: 5045825727936478870}
   - component: {fileID: 3140829599995955073}
   - component: {fileID: 3118192725672680115}
-  - component: {fileID: 1574050950201847880}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: YellowWandModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,24 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1574050950201847880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4306032956595680607}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  outlineMode: 1
-  outlineColor: {r: 1, g: 0.68598443, b: 0, a: 1}
-  outlineWidth: 2
-  precomputeOutline: 0
-  bakeKeys: []
-  bakeValues: []
 --- !u!1 &4817733880224249381
 GameObject:
   m_ObjectHideFlags: 0
@@ -115,7 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5918421302962193636}
   - component: {fileID: 8921062940988511747}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: SpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -247,9 +228,8 @@ GameObject:
   - component: {fileID: 5245569581358477705}
   - component: {fileID: -3106164321017756688}
   - component: {fileID: -5739311055201084295}
-  - component: {fileID: 5919132174337283182}
   - component: {fileID: 5083479787068108693}
-  m_Layer: 8
+  m_Layer: 12
   m_Name: SimpleWand
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -367,19 +347,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &5919132174337283182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4967556374797386163}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca9522e15f498934cab90892f602134c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  outline: {fileID: 1574050950201847880}
 --- !u!114 &5083479787068108693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -395,6 +362,10 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   spell: {fileID: 11400000, guid: e2815d7f058c2b844b4cb4c2c271f06b, type: 2}
   manaCapacity: 10
+  localizableName:
+    token: wand.name
+  localizableDescription:
+    token: wand.desc
   chargingSpeed: 1
   cooldown: 0.1
   maxSpread: {x: 0.1, y: 0.1}

@@ -9,9 +9,9 @@ namespace JoG.InventorySystem {
         private byte _count;
         private int _index;
         public int Index { get => _index; internal set => _index = value; }
-        public string Name => LocalizationManager.GetString(_data?.nameToken);
+        public string Name => Localizer.GetString(_data?.nameToken);
 
-        public string Description => LocalizationManager.GetString(_data?.descriptionToken);
+        public string Description => Localizer.GetString(_data?.descriptionToken);
 
         public Sprite Icon => _data?.icon;
 

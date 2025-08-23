@@ -12,7 +12,7 @@ namespace JoG.ChatSystem {
     public class ChatBoxController : NetworkBehaviour {
         public float fadeTimer;
         public string senderName;
-        public Color32 snederColor;
+        public Color32 senderColor;
         [SerializeField] private InputAction _inputAction;
         [field: SerializeField] public ChatBoxView View { get; private set; }
 
@@ -21,9 +21,9 @@ namespace JoG.ChatSystem {
             senderName = authenticationService.PlayerName[..^5];
             var colorStr = PlayerPrefs.GetString("player_color", "#FFFFFFFF");
             if (ColorUtility.TryParseHtmlString(colorStr, out var color)) {
-                snederColor = color;
+                senderColor = color;
             } else {
-                snederColor = new Color32(255, 255, 255, 255);
+                senderColor = new Color32(255, 255, 255, 255);
             }
         }
 
@@ -59,7 +59,7 @@ namespace JoG.ChatSystem {
             View.OnInputFieldSubmitted.AddListener(text => {
                 View.DeselectInputField();
                 if (text.IsNullOrWhiteSpace()) return;
-                SendMessageToEveryone($"{senderName.ToColored(snederColor)}: {text}");
+                SendMessageToEveryone($"{senderName.ToColored(senderColor)}: {text}");
                 View.InputFieldText = string.Empty;
             });
             _inputAction.performed += OnEnter;

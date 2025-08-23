@@ -121,8 +121,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: 0
-  healingCofficient: 0
+  damageCofficient: 1.5
+  healingCofficient: 1
 --- !u!1 &500260529379414277
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,8 +293,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: 0
-  healingCofficient: 0
+  damageCofficient: 1
+  healingCofficient: 1
 --- !u!1 &1677510096776499015
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,6 +612,7 @@ GameObject:
   - component: {fileID: 3375260616143232010}
   - component: {fileID: 1442361480306615596}
   - component: {fileID: 7870270323345327983}
+  - component: {fileID: 384310902087081202}
   m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
@@ -679,6 +680,25 @@ MonoBehaviour:
   <Top>k__BackingField: {fileID: 8916826381397992798}
   <Center>k__BackingField: {fileID: 3375260616143232010}
   <Bottom>k__BackingField: {fileID: 8203416039699417963}
+--- !u!114 &384310902087081202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5940989735750854457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8da125b7fe18e864187baa015f714197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hasValue: 0
+  damageMessage:
+    value: 0
+    cofficient: 0
+    position: {x: 0, y: 0, z: 0}
+    impulse: {x: 0, y: 0, z: 0}
+    flags: 0
 --- !u!1 &6723167559438788363
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,7 +796,7 @@ GameObject:
   - component: {fileID: 8148248421000141470}
   m_Layer: 6
   m_Name: CapsuleBody
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -970,7 +990,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   interactiveLayer:
     serializedVersion: 2
-    m_Bits: 329
+    m_Bits: 2305
   maxDistance: 3
 --- !u!114 &7814115597774941169
 MonoBehaviour:

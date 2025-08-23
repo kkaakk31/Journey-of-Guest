@@ -5,26 +5,21 @@ using UnityEngine;
 
 namespace JoG.InteractionSystem {
 
-    public class PickupItem : MonoBehaviour, IInteractable {
+    public class PickupItem : InteractableObject {
         public bool destroyAfterPickup;
         public ItemData itemData;
         public byte count = 1;
-        private NetworkObject _networkObject;
 
-        Interactability IInteractable.GetInteractability(Interactor interactor) {
+        public override Interactability GetInteractability(Interactor interactor) {
             return interactor.TryGetComponent<IItemPickUpController>(out _)
-                ? Interactability.Available
-                : Interactability.ConditionsNotMet;
+               ? Interactability.Available
+               : Interactability.ConditionsNotMet;
         }
 
-        void IInteractable.PreformInteraction(Interactor interactor) {
+        public override void PreformInteraction(Interactor interactor) {
             if (destroyAfterPickup) {
-                _networkObject.Despawn();
+                NetworkObject.Despawn();
             }
-        }
-
-        private void Awake() {
-            _networkObject = GetComponent<NetworkObject>();
         }
     }
 }

@@ -24,5 +24,9 @@ namespace JoG.Projectiles {
             position = contactPoint.point;
             normal = contactPoint.normal;
         }
+
+        public static implicit operator ProjectileHitMessage(RaycastHit hit) => new(hit);
+
+        public static implicit operator ProjectileHitMessage(ContactPoint contactPoint) => new(contactPoint);
     }
 }

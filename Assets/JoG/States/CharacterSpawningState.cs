@@ -18,12 +18,12 @@ namespace JoG.States {
         protected override bool CheckTransitionOut() => Time.time - _spawnStartTime > duration;
 
         protected void OnEnable() {
-            _body.Animator.SetBool("isSpawning", true);
+            _body.Animator.SetBool(AnimationParameters.isSpawning, true);
             _spawnStartTime = Time.time;
         }
 
         protected void OnDisable() {
-            _body.Animator.SetBool("isSpawning", false);
+            _body.Animator.SetBool(AnimationParameters.isSpawning, false);
         }
     }
 }

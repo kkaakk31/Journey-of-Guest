@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2938574778771074647}
   - component: {fileID: 6843401463100154890}
   - component: {fileID: 2819730158188804769}
-  m_Layer: 8
+  m_Layer: 11
   m_Name: SimpleWand_Pickup
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2990338471
+  GlobalObjectIdHash: 3359786641
   InScenePlacedSourceGlobalObjectIdHash: 3359786641
   DeferredDespawnTick: 0
   Ownership: 1
@@ -96,6 +96,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bc69f03e3f99964295159e02ddec238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  localizableName:
+    token: 
+  localizableDescription:
+    token: 
   destroyAfterPickup: 0
   itemData: {fileID: 11400000, guid: 8d2d5fac20696974f92820932673dce6, type: 2}
   count: 1
@@ -124,7 +129,7 @@ GameObject:
   - component: {fileID: 4808773909567643327}
   - component: {fileID: 1557115984117230991}
   - component: {fileID: 8137945794808653265}
-  m_Layer: 7
+  m_Layer: 11
   m_Name: YellowWandModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}

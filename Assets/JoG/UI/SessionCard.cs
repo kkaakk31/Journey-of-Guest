@@ -25,7 +25,7 @@ namespace JoG.UI {
         }
 
         private async void JoinSession() {
-            var result = await LoadingPanelManager.Loading(sessionService.JoinSessionByIdAsync(_sessionId),"加入中······");
+            var result = await LoadingManager.Loading(sessionService.JoinSessionByIdAsync(_sessionId),"加入中······");
             if (result is "success") {
                 var sessionCode = sessionService.SessionCode;
                 PopupManager.PopupConfirm($"加入成功，是否将会话代码{sessionCode}复制到剪切板，以便他人加入使用。", () => GUIUtility.systemCopyBuffer = sessionCode);

@@ -20,7 +20,7 @@ namespace JoG.UI {
         }
 
         private async void JoinSession() {
-            var result = await LoadingPanelManager.Loading(_sessionService.JoinSessionAsync(SessionCodeInputField.text, PasswordInputField.text),"加入中······");
+            var result = await LoadingManager.Loading(_sessionService.JoinSessionAsync(SessionCodeInputField.text, PasswordInputField.text),"加入中······");
             if (result is not "success") {
                 PopupManager.PopupConfirm("加入失败：" + result);
             };

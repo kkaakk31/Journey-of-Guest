@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 396128734745785140}
   - component: {fileID: 396128734745785143}
   - component: {fileID: 396128734745785142}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: CFXR4 Sun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4858,7 +4858,7 @@ GameObject:
   - component: {fileID: 396128735236987379}
   - component: {fileID: 396128735236987377}
   - component: {fileID: 396128735236987376}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Ember
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9705,7 +9705,7 @@ GameObject:
   - component: {fileID: 5016836507566261124}
   - component: {fileID: 7965597225262684879}
   - component: {fileID: 8211766132313776731}
-  m_Layer: 9
+  m_Layer: 15
   m_Name: FireBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9766,6 +9766,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  collisionLayer:
+    serializedVersion: 2
+    m_Bits: 36993
 --- !u!114 &7965597225262684879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9778,8 +9781,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 033db1e0a3981144dacaedffddcf4bbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageValue: 12
-  force: 1
+  damageValue: 10
+  force: 10
+  explosionRadius: 3
+  damageLayer:
+    serializedVersion: 2
+    m_Bits: 36992
   explosionEffectPrefab: {fileID: 7643585568968319505, guid: b2cbd586bac6e424f9b726c485c4e49b,
     type: 3}
 --- !u!114 &8211766132313776731
@@ -9800,7 +9807,7 @@ MonoBehaviour:
   radius: 0.01
   hitLayer:
     serializedVersion: 2
-    m_Bits: 129
+    m_Bits: 36993
 --- !u!1 &9098364580086849477
 GameObject:
   m_ObjectHideFlags: 0
@@ -9812,7 +9819,7 @@ GameObject:
   - component: {fileID: 6194687232207990842}
   - component: {fileID: 4216825475824847000}
   - component: {fileID: 4979973508476174620}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}

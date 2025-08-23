@@ -4,6 +4,8 @@ namespace JoG {
 
     public interface IDamageable {
 
-        void Handle(DamageMessage message);
+        void AddDamage(DamageMessage message);
+
+        void SubmitDamage();
     }
 }

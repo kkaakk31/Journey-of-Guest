@@ -68,8 +68,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: 0
-  healingCofficient: 0.25
+  damageCofficient: 1
+  healingCofficient: 1.25
 --- !u!1 &381714341729732202
 GameObject:
   m_ObjectHideFlags: 0
@@ -138,8 +138,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: -0.25
-  healingCofficient: -0.25
+  damageCofficient: 0.25
+  healingCofficient: 0.25
 --- !u!1 &681815670190873982
 GameObject:
   m_ObjectHideFlags: 0
@@ -177,9 +177,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 820270328106652315}
+  - {fileID: 6665684765099148732}
   - {fileID: 8354503191777010909}
   - {fileID: 838882665432281378}
-  - {fileID: 6665684765099148732}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7666835029132873609
@@ -301,7 +301,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   interactiveLayer:
     serializedVersion: 2
-    m_Bits: 329
+    m_Bits: 2305
   maxDistance: 3
 --- !u!114 &7129848452394537671
 MonoBehaviour:
@@ -383,8 +383,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: -0.5
-  healingCofficient: -0.5
+  damageCofficient: 0.5
+  healingCofficient: 0.5
 --- !u!1 &1142561870245014868
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,8 +451,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: 0.25
-  healingCofficient: 0
+  damageCofficient: 1.25
+  healingCofficient: 1
 --- !u!1 &2464413621918833767
 GameObject:
   m_ObjectHideFlags: 0
@@ -566,8 +566,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: -0.25
-  healingCofficient: -0.25
+  damageCofficient: 0.25
+  healingCofficient: 0.25
 --- !u!1 &2649420926643528220
 GameObject:
   m_ObjectHideFlags: 0
@@ -682,8 +682,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: -0.5
-  healingCofficient: -0.5
+  damageCofficient: 0.5
+  healingCofficient: 0.5
 --- !u!1 &2732456302790452501
 GameObject:
   m_ObjectHideFlags: 0
@@ -752,8 +752,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: -0.25
-  healingCofficient: -0.25
+  damageCofficient: 0.25
+  healingCofficient: 0.25
 --- !u!1 &3963387483435787187
 GameObject:
   m_ObjectHideFlags: 0
@@ -979,6 +979,7 @@ GameObject:
   - component: {fileID: 9102207783015911174}
   - component: {fileID: 9063947961052601354}
   - component: {fileID: 1099096398687094651}
+  - component: {fileID: 4945152005701765089}
   m_Layer: 6
   m_Name: Model
   m_TagString: Untagged
@@ -1150,6 +1151,25 @@ MonoBehaviour:
   <Top>k__BackingField: {fileID: 2314476250633445273}
   <Center>k__BackingField: {fileID: 1312550768482060441}
   <Bottom>k__BackingField: {fileID: 7626038366035198817}
+--- !u!114 &4945152005701765089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7730539439455128377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8da125b7fe18e864187baa015f714197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hasValue: 0
+  damageMessage:
+    value: 0
+    cofficient: 0
+    position: {x: 0, y: 0, z: 0}
+    impulse: {x: 0, y: 0, z: 0}
+    flags: 0
 --- !u!1 &7782441815850036851
 GameObject:
   m_ObjectHideFlags: 0
@@ -1218,8 +1238,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: -0.5
-  healingCofficient: -0.5
+  damageCofficient: 0.5
+  healingCofficient: 0.5
 --- !u!1 &8284892803328835579
 GameObject:
   m_ObjectHideFlags: 0
@@ -1288,8 +1308,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: -0.25
-  healingCofficient: -0.25
+  damageCofficient: 0.25
+  healingCofficient: 0.25
 --- !u!1 &8503595237324239669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1358,8 +1378,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa1f5df2930debe4691f22674f47e192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCofficient: -0.5
-  healingCofficient: -0.5
+  damageCofficient: 0.5
+  healingCofficient: 0.5
 --- !u!1001 &1364394229971940372
 PrefabInstance:
   m_ObjectHideFlags: 0
