@@ -7,22 +7,21 @@ namespace JoG.Projectiles {
     public class SimpleProjectileMotor : NetworkBehaviour, IProjectileMotor, INetworkUpdateSystem {
         public const float MAX_PASSED_TIME = 0.3f;
 
-        [Tooltip("射弹存活时间，更改在射弹生成时生效。"), Range(0, 999f)]
-        public float lifetime;
+        [Range(0, 1000f)]
+        public float lifetime = 10f;
 
-        [Range(0, 299792458f)]
-        public float speed;
+        [Range(0, 3e+8f)]
+        public float speed = 100f;
 
         [Range(float.Epsilon, 1000f)]
-        public float radius = float.Epsilon;
-
-        public LayerMask hitLayer;
+        public float radius = 0.1f;
 
         [Tooltip("network delay")]
         protected float passedTime;
 
         private float _deadtime;
         private IProjectileHitMessageHandler _messageHandler;
+        public ProjectileData Data { get; private set; }
 
         public override void OnNetworkSpawn() {
             this.RegisterNetworkUpdate();
@@ -47,7 +46,7 @@ namespace JoG.Projectiles {
                     NetworkObject.DeferDespawn(4);
                     return;
                 }
-                if (Physics.SphereCast(position, radius, forward, out var hitInfo, distance, hitLayer, QueryTriggerInteraction.Collide)) {
+                if (Physics.SphereCast(position, radius, forward, out var hitInfo, distance, Data.collisionLayer, QueryTriggerInteraction.Collide)) {
                     _messageHandler.Handle(hitInfo);
                     NetworkObject.DeferDespawn(4);
                     return;
@@ -71,6 +70,7 @@ namespace JoG.Projectiles {
 
         protected void Awake() {
             _messageHandler = GetComponent<IProjectileHitMessageHandler>();
+            Data = GetComponent<ProjectileData>();
         }
     }
 }

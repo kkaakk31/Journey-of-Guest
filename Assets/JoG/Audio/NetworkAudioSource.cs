@@ -1,5 +1,3 @@
-using GuestUnion;
-using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,19 +5,35 @@ namespace JoG.Audio {
 
     public class NetworkAudioSource : NetworkBehaviour {
         [SerializeField] private AudioSource _audioSource;
-        [SerializeField] private AudioClip[] _audioClips = Array.Empty<AudioClip>();
 
-        public void Play(byte audioIndex) {
-            PlayRpc(audioIndex);
+        public AudioSource AudioSource { get => _audioSource; }
+        public bool IsPlaying => _audioSource.isPlaying;
+
+        public void Play() {
+            PlayRpc();
         }
 
-        public void Play(string audioName) {
-            PlayRpc((byte)_audioClips.FindIndex(ac => ac.name == audioName));
+        public void PlayOnShot() {
+            PlayOnShotRpc();
+        }
+
+        public void Stop() {
+            StopRpc();
         }
 
         [Rpc(SendTo.Everyone)]
-        private void PlayRpc(byte index) {
-            _audioSource.PlayOneShot(_audioClips[index]);
+        private void PlayRpc() {
+            _audioSource.Play();
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void PlayOnShotRpc() {
+            _audioSource.PlayOneShot(_audioSource.clip);
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void StopRpc() {
+            _audioSource.Stop();
         }
     }
 }
