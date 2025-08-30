@@ -14,8 +14,8 @@ namespace JoG.InteractionSystem {
 
         public string Description => localizableDescription.Value;
 
-        public Interactability GetInteractability(Interactor interactor) {
-            return Interactability.Available;
+        public bool CanInteract(Interactor interactor) {
+            return true;
         }
 
         public string GetProperty(string key) {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EditorAttributes;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,21 +8,21 @@ using UnityEngine.UI;
 namespace JoG.InventorySystem {
 
     public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerMoveHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler {
-        [NonSerialized] public InventoryUIController controller;
+        [NonSerialized] public InventoryView view;
         [NonSerialized] public int index;
-        public GameObject iconGameObject;
-        public Image iconImage;
-        public Image slotImage;
-        public TMP_Text countText;
+        [Required] public GameObject iconGameObject;
+        [Required] public Image iconImage;
+        [Required] public Image slotImage;
+        [Required] public TMP_Text countText;
 
-        public void UpdateView(InventoryItem inventoryItem) {
-            if (inventoryItem is null || inventoryItem.Count <= 0) {
+        public void UpdateView(in InventoryItem inventoryItem) {
+            if (inventoryItem.count <= 0) {
                 iconGameObject.SetActive(false);
                 return;
             }
             iconGameObject.SetActive(true);
-            iconImage.sprite = inventoryItem.Icon;
-            countText.text = inventoryItem.Count > 1 ? inventoryItem.Count.ToString() : string.Empty;
+            iconImage.sprite = inventoryItem.IconSprite;
+            countText.text = inventoryItem.count > 1 ? inventoryItem.count.ToString() : string.Empty;
         }
 
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) {
@@ -36,28 +37,24 @@ namespace JoG.InventorySystem {
         void IBeginDragHandler.OnBeginDrag(PointerEventData eventData) {
             if (iconGameObject.activeSelf) {
                 iconGameObject.SetActive(false);
-                controller.ShowDragItem(iconImage.sprite, countText.text);
+                view.ShowDragItem(iconImage.sprite, countText.text);
             }
         }
 
         void IDragHandler.OnDrag(PointerEventData eventData) {
             if (eventData.dragging) {
-                controller.SetDragItemPosition(eventData.pointerCurrentRaycast.worldPosition);
+                view.SetDragItemPosition(eventData.pointerCurrentRaycast.worldPosition);
             }
         }
 
         void IEndDragHandler.OnEndDrag(PointerEventData eventData) {
             if (eventData.pointerEnter is not null && eventData.pointerEnter.CompareTag("Slot")) {
                 var otherSlot = eventData.pointerEnter.GetComponent<Slot>();
-                controller.ExchangeItem(index, otherSlot.index);
+                view.ExchangeItem(index, otherSlot.index);
             } else {
                 iconGameObject.SetActive(true);
             }
-            controller.HideDragItem();
-        }
-
-        private void Awake() {
-            slotImage ??= GetComponent<Image>();
+            view.HideDragItem();
         }
     }
 }

@@ -9,86 +9,77 @@ namespace JoG.InventorySystem {
     [Serializable]
     public class Inventory {
         private InventoryItem[] _items;
-        private List<Action<int>> _itemChangedHandlers;
-
-        public event Action<int> OnItemChanged {
-            add => _itemChangedHandlers.Add(value);
-            remove => _itemChangedHandlers.Add(value);
-        }
+        public int Size => _items.Length;
+        public ReadOnlySpan<InventoryItem> Items => new(_items);
 
         public Inventory(int size) {
             _items = new InventoryItem[size];
             for (var i = 0; i < size; ++i) {
-                _items[i] = new InventoryItem(this, i);
+                _items[i].index = i;
             }
         }
 
-        public InventoryItem this[int index] {
-            get => _items[index];
-            set => _items[index] = value;
-        }
+        public ref readonly InventoryItem this[int index] => ref _items[index];
 
-        public void PublishItemChanged(int index) {
-            foreach (var handler in _itemChangedHandlers.AsSpan()) {
-                handler.Invoke(index);
-            }
-        }
+        public bool TryGetItem(int index, out InventoryItem item) => _items.TryGet(index, out item);
 
-        public InventoryItem GetItemSafe(int index) {
-            return (index < 0 || index >= _items.Length) ? default : _items[index];
-        }
-
-        public void ExchangeItemSafe(int fromIndex, int toIndex) {
-            if (fromIndex == toIndex || fromIndex < 0 || fromIndex >= _items.Length || toIndex < 0 || toIndex >= _items.Length) {
-                return;
-            }
-            (_items[toIndex], _items[fromIndex]) = (_items[fromIndex], _items[toIndex]);
-            PublishItemChanged(fromIndex);
-            PublishItemChanged(toIndex);
+        public short GetItemCount(int index) {
+            return _items[index].count;
         }
 
         public void ExchangeItem(int fromIndex, int toIndex) {
             if (fromIndex != toIndex) {
-                (_items[fromIndex], _items[toIndex]) = (_items[toIndex], _items[fromIndex]);
-                PublishItemChanged(fromIndex);
-                PublishItemChanged(toIndex);
+                _items[fromIndex].Exchange(ref _items[toIndex]);
             }
         }
 
-        public void SetItemCount(ItemData itemData, byte count) {
-            if (itemData is null) return;
-            foreach (ref var item in new Span<InventoryItem>(_items)) {
-                if (item.Data == itemData) {
-                    item.Count = count;
-                    return;
-                }
+        public void SetItemCount(int index, short count) {
+            if (count > 0) {
+                _items[index].count = count;
+            } else {
+                _items[index].Set();
             }
         }
 
-        public void RemoveItem(int index, byte count) => _items[index].Count -= count;
+        public void RemoveItem(int index, short count) {
+            if (count <= 0) return;
+            ref var item = ref _items[index];
+            if (item.count > count) {
+                item.count -= count;
+            } else {
+                item.Set();
+            }
+        }
+
+        public void AddItem(int index, short count) {
+            if (count <= 0) return;
+            ref var item = ref _items[index];
+            if (item.data != null) {
+                item.count += count;
+            }
+        }
 
         /// <summary>添加物品到背包中，如果背包中已存在该物品，则增加数量；如果背包中没有空位，则不添加。</summary>
         /// <param name="itemData">要添加的物品</param>
         /// <param name="count">要添加的数量</param>
         /// <returns>添加物品在背包中的索引，如果背包已满或者添加数量为0或者物品数据为null，则返回-1</returns>
-        public int AddItem(ItemData itemData, byte count) {
-            if (itemData is null || count == 0) {
+        public int AddItem(ItemData itemData, short count) {
+            if (itemData is null || count <= 0) {
                 return -1;
             }
             var span = new Span<InventoryItem>(_items);
             var firstEmptyIndex = -1;
-            for (var i = 0; i < span.Length; ++i) {
-                var item = span[i];
-                if (item.Data == itemData) {
-                    item.Count += count;
-                    return i;
+            foreach (ref var item in span) {
+                if (item.data == itemData) {
+                    item.count += count;
+                    return item.index;
                 }
-                if (firstEmptyIndex == -1 && item.Data is null) {
-                    firstEmptyIndex = i;
+                if (firstEmptyIndex == -1 && item.data is null) {
+                    firstEmptyIndex = item.index;
                 }
             }
             if (firstEmptyIndex != -1) {
-                span[firstEmptyIndex].SetDataAndCount(itemData, count);
+                span[firstEmptyIndex].Set(itemData, count);
             }
             return firstEmptyIndex;
         }
@@ -97,20 +88,18 @@ namespace JoG.InventorySystem {
         /// <param name="itemData">指定的物品</param>
         /// <param name="count">要移除的数量</param>
         /// <returns>移除物品在背包中的索引，未找到或者添加数量为0或者物品数据为null，则返回-1</returns>
-        public int RemoveItem(ItemData itemData, byte count) {
-            if (itemData is null || count == 0) {
+        public int RemoveItem(ItemData itemData, short count) {
+            if (itemData is null || count <= 0) {
                 return -1;
             }
-            var span = new Span<InventoryItem>(_items);
-            for (var i = 0; i < span.Length; ++i) {
-                var item = span[i];
-                if (item.Data == itemData) {
-                    if (item.Count > count) {
-                        item.Count -= count;
+            foreach (ref var item in _items.AsSpan()) {
+                if (item.data == itemData) {
+                    if (item.count > count) {
+                        item.count -= count;
                     } else {
-                        item.SetDataAndCount();
+                        item.Set();
                     }
-                    return i;
+                    return item.index;
                 }
             }
             return -1;
@@ -120,38 +109,39 @@ namespace JoG.InventorySystem {
             if (json.IsNullOrEmpty()) {
                 return;
             }
-            var inventoryItemDatas = JsonConvert.DeserializeObject<InventoryItemData[]>(json);
-            if (inventoryItemDatas.IsNullOrEmpty()) {
+            var serializedItems = JsonConvert.DeserializeObject<List<SerializedItem>>(json);
+            if (serializedItems.IsNullOrEmpty()) {
                 return;
             }
-            var span = inventoryItemDatas.AsSpan();
-            var size = span.Length;
-            Array.Resize(ref _items, size);
-            for (var i = 0; i < size; ++i) {
-                var inventoryItemData = span[i];
-                if (inventoryItemData.itemCount > 0) {
-                    ItemCatalog.TryGetItemDef(inventoryItemData.itemNameToken, out var itemData);
-                    _items[i].SetDataAndCount(itemData, inventoryItemData.itemCount);
+            foreach (ref var item in serializedItems.AsSpan()) {
+                if (item.index < 0 || item.index >= _items.Length) {
+                    continue;
+                }
+                if (ItemCatalog.TryGetItemDef(item.itemToken, out var itemData)) {
+                    _items[item.index].Set(itemData, item.itemCount);
                 }
             }
         }
 
         public string ToJson() {
-            var itemDatas = new InventoryItemData[_items.Length];
-            for (int i = 0; i < _items.Length; i++) {
-                var item = _items[i];
-                itemDatas[i] = new InventoryItemData {
-                    itemNameToken = item.Data?.nameToken,
-                    itemCount = item.Count
-                };
+            var itemDataList = new List<SerializedItem>();
+            foreach (ref readonly var item in new ReadOnlySpan<InventoryItem>(_items)) {
+                if (item.count > 0 && item.data != null) {
+                    itemDataList.Add(new SerializedItem {
+                        itemToken = item.data.nameToken,
+                        itemCount = item.count,
+                        index = item.index
+                    });
+                }
             }
-            return JsonConvert.SerializeObject(itemDatas);
+            return JsonConvert.SerializeObject(itemDataList);
         }
 
         [Serializable]
-        private struct InventoryItemData {
-            public string itemNameToken;
-            public byte itemCount;
+        private struct SerializedItem {
+            public string itemToken;
+            public short itemCount;
+            public int index;
         }
     }
 }

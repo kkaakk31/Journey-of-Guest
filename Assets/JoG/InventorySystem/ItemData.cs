@@ -1,5 +1,4 @@
-﻿using System;
-using Unity.Netcode;
+﻿using JoG.Localization;
 using UnityEngine;
 
 namespace JoG.InventorySystem {
@@ -8,7 +7,9 @@ namespace JoG.InventorySystem {
     public class ItemData : ScriptableObject {
         public string nameToken;
         public string descriptionToken;
-        public Sprite icon;
+        public Sprite iconSprite;
         public GameObject prefab;
+        public string Name => Localizer.GetString(nameToken);
+        public string Description => Localizer.GetString(descriptionToken);
     }
 }

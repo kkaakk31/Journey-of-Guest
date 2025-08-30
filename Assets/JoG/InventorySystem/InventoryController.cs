@@ -10,23 +10,20 @@ using VContainer;
 
 namespace JoG.InventorySystem {
 
-    public class InventoryController : MonoBehaviour, IInventoryController, IMessageHandler<CharacterBodyChangedMessage> {
+    public class InventoryController : MonoBehaviour, IMessageHandler<CharacterBodyChangedMessage> {
         public Inventory inventory;
         public InputActionReference numberInput;
         public int selectedIndex = 0;
-
-        // UI控制器引用
-        [Required] public InventoryUIController uiController;
-
+        [Required] public InventoryView view;
         private CharacterBody _body;
         private IDisposable _disposable;
-        private ItemController _itemController;
+        private ItemUser _itemUser;
 
         [Button]
         public int AddItem(string itemName, int count) {
             if (ItemCatalog.TryGetItemDef(itemName, out var itemData)) {
-                var index = inventory.AddItem(itemData, (byte)count);
-                uiController.RefreshSlot(index);
+                var index = inventory.AddItem(itemData, (short)count);
+                view.RefreshSlot(index);
                 return index;
             } else {
                 return -1;
@@ -35,9 +32,9 @@ namespace JoG.InventorySystem {
 
         [Button]
         public void ExchangeItem(int fromIndex, int toIndex) {
-            inventory.ExchangeItemSafe(fromIndex, toIndex);
-            uiController.RefreshSlot(fromIndex);
-            uiController.RefreshSlot(toIndex);
+            inventory.ExchangeItem(fromIndex, toIndex);
+            view.RefreshSlot(fromIndex);
+            view.RefreshSlot(toIndex);
             if (selectedIndex == fromIndex || selectedIndex == toIndex) {
                 SelectItem(selectedIndex);
             }
@@ -50,42 +47,50 @@ namespace JoG.InventorySystem {
 
         void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
             _body = message.body;
-            if (message.changeType is CharacterBodyChangeType.Get && _body.TryGetComponent(out _itemController)) {
+            if (message.changeType is CharacterBodyChangeType.Get && _body.TryGetComponent(out _itemUser)) {
                 enabled = true;
-                uiController.enabled = true;
-                _itemController.InventoryController = this;
-                var item = inventory.GetItemSafe(selectedIndex);
-                _itemController.Use(item);
+                view.enabled = true;
+                _itemUser.Controller = this;
+                var item = inventory[selectedIndex];
+                _itemUser.Use(item);
             } else {
                 enabled = false;
-                uiController.enabled = false;
-                if (_itemController != null) {
-                    _itemController.InventoryController = null;
+                view.enabled = false;
+                if (_itemUser != null) {
+                    _itemUser.Controller = null;
                 }
-                _itemController = null;
+                _itemUser = null;
             }
         }
 
-        public int AddItem(ItemData item, byte count) {
+        public int AddItem(ItemData item, short count) {
             var index = inventory.AddItem(item, count);
-            uiController.RefreshSlot(index);
+            view.RefreshSlot(index);
             if (index == selectedIndex) {
                 SelectItem(index);
             }
             return index;
         }
 
-        public void RemoveItem(int index, byte count) {
-            inventory.RemoveItem(index, count);
-            uiController.RefreshSlot(index);
+        public void AddItem(int index, short count) {
+            inventory.AddItem(index, count);
+            view.RefreshSlot(index);
             if (index == selectedIndex) {
                 SelectItem(index);
             }
         }
 
-        public int RemoveItem(ItemData item, byte count) {
+        public void RemoveItem(int index, short count) {
+            inventory.RemoveItem(index, count);
+            view.RefreshSlot(index);
+            if (index == selectedIndex) {
+                SelectItem(index);
+            }
+        }
+
+        public int RemoveItem(ItemData item, short count) {
             var index = inventory.RemoveItem(item, count);
-            uiController.RefreshSlot(index);
+            view.RefreshSlot(index);
             if (index == selectedIndex) {
                 SelectItem(index);
             }
@@ -94,13 +99,11 @@ namespace JoG.InventorySystem {
 
         public void SelectItem(int index) {
             selectedIndex = index;
-            var item = inventory.GetItemSafe(selectedIndex);
-            _itemController.Use(item);
-            uiController.HighlightAt(selectedIndex);
+            _itemUser.Use(inventory[selectedIndex]);
+            view.HighlightSlot(selectedIndex);
         }
 
         private void Awake() {
-            // 数据初始化
             inventory = new Inventory(60);
             var inventoryJson = PlayerPrefs.GetString("player_inventory", string.Empty);
             inventory.FromJson(inventoryJson);

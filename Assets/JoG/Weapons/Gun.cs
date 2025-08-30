@@ -52,10 +52,6 @@ namespace JoG.Weapons {
         public void PreformInteraction(Interactor interactor) {
         }
 
-        public Interactability GetInteractability(Interactor interactor) {
-            return OwnerBody is null ? Interactability.Available : Interactability.Disabled;
-        }
-
         public void PushTriggerState(bool down) {
             if (down) {
                 if (fireMode is FireMode.FullyAutomatic && CanFire()) {
@@ -79,7 +75,9 @@ namespace JoG.Weapons {
             throw new NotImplementedException();
         }
 
-      
+        public bool CanInteract(Interactor interactor) {
+            throw new NotImplementedException();
+        }
 
         protected virtual void FireAuthority() {
             BulletSpawnPoint.GetPositionAndRotation(out var position, out var rotation);

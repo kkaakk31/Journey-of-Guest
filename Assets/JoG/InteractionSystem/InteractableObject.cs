@@ -11,7 +11,7 @@ namespace JoG.InteractionSystem {
 
         public string GetProperty(string token) => Localizer.GetString(token);
 
-        public abstract Interactability GetInteractability(Interactor interactor);
+        public abstract bool CanInteract(Interactor interactor);
 
         public abstract void PreformInteraction(Interactor interactor);
     }

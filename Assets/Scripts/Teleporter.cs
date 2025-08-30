@@ -9,10 +9,8 @@ namespace JoG {
         public string nextSceneName = string.Empty;
         [Inject] private NetworkManager _networkManager;
 
-        public override Interactability GetInteractability(Interactor interactor) {
-            return enabled
-                ? interactor.CompareTag("Player") ? Interactability.Available : Interactability.ConditionsNotMet
-                : Interactability.Disabled;
+        public override bool CanInteract(Interactor interactor) {
+            return IsSpawned;
         }
 
         public void Activate() {

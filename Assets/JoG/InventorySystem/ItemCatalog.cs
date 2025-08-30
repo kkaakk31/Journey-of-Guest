@@ -46,8 +46,8 @@ namespace JoG.InventorySystem {
         }
 
         /// <summary>查询</summary>
-        public static bool TryGetItemDef(string itemName, out ItemData itemData)
-            => _nameToItemDatas.TryGetValue(itemName, out itemData);
+        public static bool TryGetItemDef(string itemToken, out ItemData itemData)
+            => _nameToItemDatas.TryGetValue(itemToken, out itemData);
 
         /// <summary>清空所有已注册</summary>
         public static void Clear() => _nameToItemDatas.Clear();

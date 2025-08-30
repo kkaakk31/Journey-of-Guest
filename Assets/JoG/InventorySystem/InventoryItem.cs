@@ -1,57 +1,27 @@
-﻿using JoG.Localization;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace JoG.InventorySystem {
 
-    public class InventoryItem {
-        private Inventory _inventory;
-        private ItemData _data;
-        private byte _count;
-        private int _index;
-        public int Index { get => _index; internal set => _index = value; }
-        public string Name => Localizer.GetString(_data?.nameToken);
+    public struct InventoryItem {
+        public ItemData data;
+        public short count;
+        public int index;
+        public readonly string Name => data?.Name;
 
-        public string Description => Localizer.GetString(_data?.descriptionToken);
+        public readonly string Description => data?.Description;
 
-        public Sprite Icon => _data?.icon;
+        public readonly Sprite IconSprite => data?.iconSprite;
 
-        public GameObject Prefab => _data?.prefab;
-        public Inventory Inventory => _inventory;
+        public readonly GameObject Prefab => data?.prefab;
 
-        public byte Count {
-            get => _count;
-            set {
-                if (_count == value) return;
-                _count = value;
-                if (value == 0) {
-                    _data = null;
-                }
-                _inventory.PublishItemChanged(_index);
-            }
+        public void Set(ItemData itemData = null, short itemCount = 0) {
+            data = itemData;
+            count = itemCount;
         }
 
-        public ItemData Data {
-            get => _data;
-            set {
-                if (_data == value) return;
-                _data = value;
-                if (value == null) {
-                    _count = 0;
-                }
-                _inventory.PublishItemChanged(_index);
-            }
-        }
-
-        public InventoryItem(Inventory inventory, int index) {
-            _inventory = inventory;
-            _index = index;
-        }
-
-        public void SetDataAndCount(ItemData itemData = null, byte itemCount = 0) {
-            if (_data == itemData && _count == itemCount) return;
-            _data = itemData;
-            _count = itemCount;
-            _inventory.PublishItemChanged(_index);
+        public void Exchange(ref InventoryItem other) {
+            (other.data, data) = (data, other.data);
+            (other.count, count) = (count, other.count);
         }
     }
 }

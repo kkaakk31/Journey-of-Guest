@@ -74,6 +74,10 @@ namespace System.Runtime.InteropServices {
             return span;
         }
 
+        public static ReadOnlySpan<T> AsReadOnlySpan<T>(this List<T>? list) {
+            return AsSpan(list);
+        }
+
         /// <summary>
         /// Gets either a ref to a <typeparamref name="TValue"/> in the <see cref="Dictionary{TKey, TValue}"/> or a ref null if it does not exist in the <paramref name="dictionary"/>.
         /// </summary>

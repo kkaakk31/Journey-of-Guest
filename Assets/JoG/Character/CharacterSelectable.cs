@@ -1,11 +1,10 @@
-﻿using JoG.Character;
-using JoG.DebugExtensions;
+﻿using JoG.DebugExtensions;
 using JoG.InteractionSystem;
 using JoG.Localization;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace JoG.Assets.JoG.Character {
+namespace JoG.Character {
 
     public class CharacterSelectable : MonoBehaviour, IInteractable, IInformationProvider {
         public LocalizableString localizableName;
@@ -19,10 +18,8 @@ namespace JoG.Assets.JoG.Character {
             return Localizer.GetString(key);
         }
 
-        Interactability IInteractable.GetInteractability(Interactor interactor) {
-            return interactor.TryGetComponent<CharacterBody>(out _)
-                ? Interactability.Available
-                : Interactability.ConditionsNotMet;
+        public bool CanInteract(Interactor interactor) {
+            return interactor.TryGetComponent<CharacterBody>(out _);
         }
 
         void IInteractable.PreformInteraction(Interactor interactor) {

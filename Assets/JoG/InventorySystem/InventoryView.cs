@@ -8,33 +8,30 @@ using UnityEngine.InputSystem;
 
 namespace JoG.InventorySystem {
 
-    public class InventoryUIController : MonoBehaviour {
-
-        [Header("依赖组件")]
-        [Required] public InventoryController inventoryController;
-        public GameObject inventoryRoot;
-        public GameObject tablePanel;
-        public GameObject hotBarPanel;
+    public class InventoryView : MonoBehaviour {
+        [Required] public InventoryController controller;
+        [Required] public GameObject inventoryRoot;
+        [Required] public GameObject tablePanel;
+        [Required] public GameObject hotBarPanel;
         public DragItem dragItem;
         public Color selectedColor = Color.yellow;
         public Color normalColor = Color.white;
-        [SerializeField, Required] private InputActionReference _uiToggle;
+        [SerializeField, Required] private InputActionReference _tableToggle;
         private List<Slot> slots = new();
         private Slot selectedSlot;
 
         public void RefreshAllSlots() {
-            var span = slots.AsSpan();
-            for (var i = 0; i < span.Length; ++i) {
-                span[i].UpdateView(inventoryController.inventory[i]);
+            foreach (var slot in slots.AsSpan()) {
+                slot.UpdateView(controller.inventory[slot.index]);
             }
         }
 
         public void RefreshSlot(int index) {
             if (index >= 0 && index < slots.Count)
-                slots[index].UpdateView(inventoryController.inventory[index]);
+                slots[index].UpdateView(controller.inventory[index]);
         }
 
-        public void HighlightAt(int selectedIndex) {
+        public void HighlightSlot(int selectedIndex) {
             if (selectedSlot != null) {
                 selectedSlot.slotImage.color = normalColor;
             }
@@ -58,14 +55,14 @@ namespace JoG.InventorySystem {
         }
 
         public void ExchangeItem(int from, int to) {
-            inventoryController.ExchangeItem(from, to);
+            controller.ExchangeItem(from, to);
         }
 
         private void Awake() {
             GetComponentsInChildren(true, slots);
             for (var i = 0; i < slots.Count; i++) {
                 var slot = slots[i];
-                slot.controller = this;
+                slot.view = this;
                 slot.index = i;
             }
         }
@@ -75,9 +72,9 @@ namespace JoG.InventorySystem {
             tablePanel.SetActive(false);
             hotBarPanel.SetActive(true);
             RefreshAllSlots();
-            HighlightAt(inventoryController.selectedIndex);
-            _uiToggle.action.performed += OnUIToggle;
-            _uiToggle.action.Enable();
+            HighlightSlot(controller.selectedIndex);
+            _tableToggle.action.performed += OnUIToggle;
+            _tableToggle.action.Enable();
         }
 
         private void OnDisable() {
@@ -87,8 +84,8 @@ namespace JoG.InventorySystem {
                 CursorManager.Instance.HideCursor();
             }
             inventoryRoot.SetActive(false);
-            _uiToggle.action.Disable();
-            _uiToggle.action.performed -= OnUIToggle;
+            _tableToggle.action.Disable();
+            _tableToggle.action.performed -= OnUIToggle;
         }
 
         private void OnUIToggle(InputAction.CallbackContext callback) {

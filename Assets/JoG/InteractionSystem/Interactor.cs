@@ -14,7 +14,7 @@ namespace JoG.InteractionSystem {
                     using (ListPool<IInteractionMessageHandler>.Rent(out var handlers)) {
                         gameObject.GetComponentsInChildren(handlers);
                         foreach (var interactable in interactables.AsSpan()) {
-                            if (interactable.GetInteractability(this) is Interactability.Available) {
+                            if (interactable.CanInteract(this)) {
                                 foreach (var handler in handlers.AsSpan()) {
                                     handler.Handle(interactable);
                                 }
