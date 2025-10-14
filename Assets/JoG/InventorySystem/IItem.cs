@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-
-namespace JoG.InventorySystem {
-
+﻿namespace JoG.InventorySystem {
     public interface IItem {
         ItemData ItemData { get; }
     }

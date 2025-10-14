@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace JoG.Projectiles {
 
-    public struct ProjectileHitMessage {
+    [Serializable]
+    public struct CollisionMessage {
         public Collider collider;
 
         public Rigidbody rigidbody;
@@ -11,22 +13,22 @@ namespace JoG.Projectiles {
 
         public Vector3 normal;
 
-        public ProjectileHitMessage(RaycastHit hit) {
+        public CollisionMessage(in RaycastHit hit) {
             collider = hit.collider;
             rigidbody = collider.attachedRigidbody;
             position = hit.point;
             normal = hit.normal;
         }
 
-        public ProjectileHitMessage(ContactPoint contactPoint) {
+        public CollisionMessage(in ContactPoint contactPoint) {
             collider = contactPoint.otherCollider;
             rigidbody = collider.attachedRigidbody;
             position = contactPoint.point;
             normal = contactPoint.normal;
         }
 
-        public static implicit operator ProjectileHitMessage(RaycastHit hit) => new(hit);
+        public static implicit operator CollisionMessage(in RaycastHit hit) => new(hit);
 
-        public static implicit operator ProjectileHitMessage(ContactPoint contactPoint) => new(contactPoint);
+        public static implicit operator CollisionMessage(in ContactPoint contactPoint) => new(contactPoint);
     }
 }

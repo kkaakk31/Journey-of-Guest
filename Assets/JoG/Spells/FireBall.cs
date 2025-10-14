@@ -19,8 +19,8 @@ namespace JoG.Spells {
                  false,
                  position,
                  rotation);
-            var projectile = nob.GetComponent<ProjectileData>();
-            projectile.ownerReference = caster.NetworkObject;
+            var projectile = nob.GetComponent<ProjectileContext>();
+            projectile.OwnerObject = caster.NetworkObject;
         }
     }
 }

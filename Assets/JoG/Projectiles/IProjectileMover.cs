@@ -2,6 +2,6 @@
 
 namespace JoG.Projectiles {
 
-    public interface IProjectileMotor {
+    public interface IProjectileMover {
     }
 }

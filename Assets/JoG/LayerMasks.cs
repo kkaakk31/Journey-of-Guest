@@ -12,6 +12,7 @@ namespace JoG {
         public static LayerMask ui = LayerMask.GetMask("UI");
         public static LayerMask water = LayerMask.GetMask("Water");
         public static LayerMask trigger = LayerMask.GetMask("Trigger");
+        public static LayerMask dynamic = LayerMask.GetMask("Dynamic");
         public static LayerMask transparentFX = LayerMask.GetMask("TransparentFX");
         public static LayerMask projectile = LayerMask.GetMask("Projectile");
         public static LayerMask postProcessing = LayerMask.GetMask("PostProcessing");

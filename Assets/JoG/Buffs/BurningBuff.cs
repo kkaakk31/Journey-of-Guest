@@ -46,7 +46,9 @@ namespace JoG.Buffs {
         }
 
         protected override void MergeWith(BurningBuff buff) {
-            damageCount += buff.damageCount;
+            uint totalDamageValuePerTick = damageValuePerTick + buff.damageValuePerTick;
+            damageCount = (ushort)((TotalDamage + buff.TotalDamage) / totalDamageValuePerTick);
+            damageValuePerTick = totalDamageValuePerTick;
         }
 
         protected override void OnTick() {

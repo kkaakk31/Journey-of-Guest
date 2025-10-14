@@ -2,7 +2,7 @@
 
 namespace JoG.InventorySystem {
 
-    public interface IInventory<TItem> where TItem : IItem {
+    public interface IInventory<TItem> where TItem : IItemSlot {
         public ICollection<TItem> Items { get; }
     }
 }

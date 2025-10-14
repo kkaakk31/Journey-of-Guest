@@ -1,4 +1,5 @@
 ﻿using JoG.Localization;
+using System;
 using UnityEngine;
 
 namespace JoG.InventorySystem {
@@ -9,7 +10,9 @@ namespace JoG.InventorySystem {
         public string descriptionToken;
         public Sprite iconSprite;
         public GameObject prefab;
+        public short maxStack = 1;
         public string Name => Localizer.GetString(nameToken);
+
         public string Description => Localizer.GetString(descriptionToken);
     }
 }

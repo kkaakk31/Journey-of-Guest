@@ -40,9 +40,6 @@ namespace JoG.Magic {
             SpawnPoint.GetPositionAndRotation(out var position, out var rotation);
             var spread = CurrentRandomSpread;
             spell.Cast(caster, position, rotation.ApplySpread(spread.y, spread.x));
-            if (spell.spellClip != null) {
-                AudioSource.PlayOneShot(spell.spellClip);
-            }
             _lastCastTime = Time.time;
         }
 

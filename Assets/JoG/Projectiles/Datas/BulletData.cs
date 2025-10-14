@@ -1,4 +1,4 @@
-﻿using JoG.Effects.Pools;
+﻿using JoG.VisualEffects.Pools;
 using System;
 using UnityEngine;
 

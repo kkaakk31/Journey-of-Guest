@@ -51,8 +51,7 @@ namespace JoG.InventorySystem {
                 enabled = true;
                 view.enabled = true;
                 _itemUser.Controller = this;
-                var item = inventory[selectedIndex];
-                _itemUser.Use(item);
+                SelectItem(selectedIndex);
             } else {
                 enabled = false;
                 view.enabled = false;
@@ -99,8 +98,8 @@ namespace JoG.InventorySystem {
 
         public void SelectItem(int index) {
             selectedIndex = index;
-            _itemUser.Use(inventory[selectedIndex]);
-            view.HighlightSlot(selectedIndex);
+            _itemUser.Use(inventory[index]);
+            view.HighlightSlot(index);
         }
 
         private void Awake() {
@@ -112,6 +111,7 @@ namespace JoG.InventorySystem {
         private void OnEnable() {
             numberInput.action.performed += OnNumInput;
             numberInput.action.Enable();
+            view.RefreshAllSlots();
         }
 
         private void OnDisable() {

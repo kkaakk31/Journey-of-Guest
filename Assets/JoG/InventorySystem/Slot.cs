@@ -7,54 +7,29 @@ using UnityEngine.UI;
 
 namespace JoG.InventorySystem {
 
-    public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerMoveHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    public partial class Slot : MonoBehaviour {
         [NonSerialized] public InventoryView view;
-        [NonSerialized] public int index;
-        [Required] public GameObject iconGameObject;
+        [Required] public GameObject iconObject;
         [Required] public Image iconImage;
         [Required] public Image slotImage;
         [Required] public TMP_Text countText;
 
-        public void UpdateView(in InventoryItem inventoryItem) {
-            if (inventoryItem.count <= 0) {
-                iconGameObject.SetActive(false);
-                return;
-            }
-            iconGameObject.SetActive(true);
-            iconImage.sprite = inventoryItem.IconSprite;
-            countText.text = inventoryItem.count > 1 ? inventoryItem.count.ToString() : string.Empty;
+        protected void Awake() {
+            view = GetComponentInParent<InventoryView>();
         }
 
-        void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) {
-        }
-
-        void IPointerMoveHandler.OnPointerMove(PointerEventData eventData) {
-        }
-
-        void IPointerExitHandler.OnPointerExit(PointerEventData eventData) {
-        }
-
-        void IBeginDragHandler.OnBeginDrag(PointerEventData eventData) {
-            if (iconGameObject.activeSelf) {
-                iconGameObject.SetActive(false);
-                view.ShowDragItem(iconImage.sprite, countText.text);
-            }
-        }
-
-        void IDragHandler.OnDrag(PointerEventData eventData) {
-            if (eventData.dragging) {
-                view.SetDragItemPosition(eventData.pointerCurrentRaycast.worldPosition);
-            }
-        }
-
-        void IEndDragHandler.OnEndDrag(PointerEventData eventData) {
-            if (eventData.pointerEnter is not null && eventData.pointerEnter.CompareTag("Slot")) {
-                var otherSlot = eventData.pointerEnter.GetComponent<Slot>();
-                view.ExchangeItem(index, otherSlot.index);
+        protected void OnValidate() {
+            if (_itemData == null || _itemCount <= 0) {
+                iconObject.SetActive(false);
             } else {
-                iconGameObject.SetActive(true);
+                iconObject.SetActive(true);
+                if (iconImage != null) {
+                    iconImage.sprite = _itemData.iconSprite;
+                }
+                if (countText != null) {
+                    countText.text = _itemCount > 1 ? _itemCount.ToString() : string.Empty;
+                }
             }
-            view.HideDragItem();
         }
     }
 }

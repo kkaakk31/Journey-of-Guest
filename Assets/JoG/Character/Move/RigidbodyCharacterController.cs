@@ -94,6 +94,10 @@ namespace JoG.Character.Move {
             UpdateCapsuleTopAndBottomOffset();
         }
 
+        private void OnEnable() {
+            _rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+        }
+
         private void FixedUpdate() {
             _position = _rigidbody.position;
             lastVelocity = currentVelocity;
@@ -111,6 +115,10 @@ namespace JoG.Character.Move {
 
         private void Update() {
             UpdateRotation(Time.deltaTime);
+        }
+
+        private void OnDisable() {
+            _rigidbody.interpolation = RigidbodyInterpolation.None;
         }
 
         private void OnDestroy() {

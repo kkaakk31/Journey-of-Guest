@@ -6,7 +6,7 @@ namespace JoG.Audio {
     public class NetworkAudioSource : NetworkBehaviour {
         [SerializeField] private AudioSource _audioSource;
 
-        public AudioSource AudioSource { get => _audioSource; }
+        public AudioSource AudioSource => _audioSource;
         public bool IsPlaying => _audioSource.isPlaying;
 
         public void Play() {

@@ -1,10 +1,14 @@
 ﻿using EditorAttributes;
 using GuestUnion;
+using JoG.UI;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 namespace JoG.InventorySystem {
 
@@ -14,48 +18,77 @@ namespace JoG.InventorySystem {
         [Required] public GameObject tablePanel;
         [Required] public GameObject hotBarPanel;
         public DragItem dragItem;
-        public Color selectedColor = Color.yellow;
+        public Color highlightColor = Color.yellow;
         public Color normalColor = Color.white;
+        public TooltipView tooltipView;
         [SerializeField, Required] private InputActionReference _tableToggle;
         private List<Slot> slots = new();
-        private Slot selectedSlot;
+        private Slot highlightSlot;
 
         public void RefreshAllSlots() {
             foreach (var slot in slots.AsSpan()) {
-                slot.UpdateView(controller.inventory[slot.index]);
+                //slot.UpdateView(controller.inventory[slot.Index]);
             }
         }
 
         public void RefreshSlot(int index) {
-            if (index >= 0 && index < slots.Count)
-                slots[index].UpdateView(controller.inventory[index]);
-        }
-
-        public void HighlightSlot(int selectedIndex) {
-            if (selectedSlot != null) {
-                selectedSlot.slotImage.color = normalColor;
-            }
-            if (slots.TryGetAt(selectedIndex, out selectedSlot)) {
-                selectedSlot.slotImage.color = selectedColor;
+            if (index >= 0 && index < slots.Count) {
+                //slots[index].UpdateView(controller.inventory[index]);
             }
         }
 
-        public void ShowDragItem(Sprite iconSprite, string countText) {
-            dragItem.iconImage.sprite = iconSprite;
-            dragItem.countText.text = countText;
-            dragItem.gameObject.SetActive(true);
+        public void HighlightSlot(int index) {
+            if (highlightSlot != null) {
+                highlightSlot.slotImage.color = normalColor;
+            }
+            if (slots.TryGetAt(index, out highlightSlot)) {
+                highlightSlot.slotImage.color = highlightColor;
+            }
         }
 
-        public void SetDragItemPosition(Vector2 position) {
-            dragItem.transform.localPosition = position;
+        public void OnPointerEnter(Slot slot, PointerEventData eventData) {
+            var item = controller.inventory[slot.Index];
+            if (item.count > 0) {
+                tooltipView.SetTooltip(item.Name);
+                tooltipView.SetPosition(eventData.pointerCurrentRaycast.worldPosition);
+                tooltipView.Show();
+            }
         }
 
-        public void HideDragItem() {
+        public void OnPointerMove(Slot slot, PointerEventData eventData) {
+            if (!eventData.dragging) {
+                tooltipView.SetPosition(eventData.pointerCurrentRaycast.worldPosition);
+            }
+        }
+
+        public void OnPointerExit(Slot slot, PointerEventData eventData) {
+            tooltipView.Hide();
+        }
+
+        public void OnBeginDrag(Slot slot, PointerEventData eventData) {
+            if (slot.iconObject.activeSelf) {
+                slot.iconObject.SetActive(false);
+                dragItem.iconImage.sprite = slot.iconImage.sprite;
+                dragItem.countText.text = slot.countText.text;
+                dragItem.gameObject.SetActive(true);
+                tooltipView.Hide();
+            }
+        }
+
+        public void OnDrag(Slot slot, PointerEventData eventData) {
+            if (eventData.dragging && dragItem.gameObject.activeSelf) {
+                dragItem.transform.localPosition = eventData.pointerCurrentRaycast.worldPosition;
+            }
+        }
+
+        public void OnEndDrag(Slot slot, PointerEventData eventData) {
+            if (!dragItem.gameObject.activeSelf) return;
+            if (eventData.pointerEnter is not null && eventData.pointerEnter.TryGetComponent<Slot>(out var otherSlot)) {
+                controller.ExchangeItem(slot.Index, otherSlot.Index);
+            } else {
+                slot.iconObject.SetActive(true);
+            }
             dragItem.gameObject.SetActive(false);
-        }
-
-        public void ExchangeItem(int from, int to) {
-            controller.ExchangeItem(from, to);
         }
 
         private void Awake() {
@@ -63,7 +96,7 @@ namespace JoG.InventorySystem {
             for (var i = 0; i < slots.Count; i++) {
                 var slot = slots[i];
                 slot.view = this;
-                slot.index = i;
+                slot.Index = i;
             }
         }
 
@@ -71,8 +104,6 @@ namespace JoG.InventorySystem {
             inventoryRoot.SetActive(true);
             tablePanel.SetActive(false);
             hotBarPanel.SetActive(true);
-            RefreshAllSlots();
-            HighlightSlot(controller.selectedIndex);
             _tableToggle.action.performed += OnUIToggle;
             _tableToggle.action.Enable();
         }

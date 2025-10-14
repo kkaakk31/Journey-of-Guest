@@ -304,7 +304,7 @@ namespace JoG.Character.Move {
         }
 
         //private void TryStepUp(in Vector3 direction, float checkDistance = 0.05f) {
-        //    var backstepDistance = 0.1f * _capsule.radius;
+        //    var backstepDistance = 0.1f * _capsule.detectionRadius;
         //    var origin = _position - backstepDistance * (direction - _characterUp);
         //    checkDistance += backstepDistance;
         //    var closestStepHit = defaultAttacker(RaycastHit);
@@ -331,7 +331,7 @@ namespace JoG.Character.Move {
         //    //Debug.DrawLine(closestStepHit.point, closestStepHit.point + closestStepHit.normal,Color.cyan);
         //    continueTry = false;
         //    var footHeightVector = Vector3.Project(groundPosition, _characterUp);
-        //    origin = closestStepHit.point - 0.5f * _capsule.radius * direction;
+        //    origin = closestStepHit.point - 0.5f * _capsule.detectionRadius * direction;
         //    origin = Vector3.ProjectOnPlane(origin, _characterUp) + footHeightVector;
         //    origin += (0.5f * _capsule.height + maxStepHeight) * _characterUp;
         //    var stableStepHit = defaultAttacker(RaycastHit);
@@ -371,11 +371,11 @@ namespace JoG.Character.Move {
            if (groundStatus.IsStableOnGround) {
                     var originPoint = closestHit.point;
                     var planePoints = new List<Vector3>();
-                    var radius = _capsule.radius;
-                    var offset = 0.1f * radius * _characterForward + radius * _characterUp;
+                    var detectionRadius = _capsule.detectionRadius;
+                    var offset = 0.1f * detectionRadius * _characterForward + detectionRadius * _characterUp;
                     var quaternion = Quaternion.AngleAxis(72f, direction);
                     for (int i = 0; i < 5; ++i) {
-                        if (Physics.Raycast(originPoint + offset, direction, out var hitInfo, 1.1f * radius, collisionMask, QueryTriggerInteraction.Ignore)) {
+                        if (Physics.Raycast(originPoint + offset, direction, out var hitInfo, 1.1f * detectionRadius, collisionMask, QueryTriggerInteraction.Ignore)) {
                             planePoints.Add(hitInfo.point);
                         }
                         offset = quaternion * offset;

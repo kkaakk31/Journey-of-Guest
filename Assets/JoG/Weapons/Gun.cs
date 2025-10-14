@@ -31,7 +31,7 @@ namespace JoG.Weapons {
         [field: SerializeField] public GunData Data { get; private set; }
         [field: SerializeField] public Transform BulletSpawnPoint { get; private set; }
         [field: SerializeField] public Transform MagazineTransform { get; private set; }
-        public ProjectileData BulletPrefab { get; private set; }
+        public ProjectileContext BulletPrefab { get; private set; }
 
         /// <summary>SyncType. Write: ServerOnly</summary>
         public CharacterBody OwnerBody {
@@ -83,7 +83,7 @@ namespace JoG.Weapons {
             BulletSpawnPoint.GetPositionAndRotation(out var position, out var rotation);
             var spread = GetRandomSpread();
             var no = Instantiate(BulletPrefab.GetComponent<NetworkObject>(), position, rotation.ApplySpread(spread.y, spread.x));
-            no.GetComponent<ProjectileData>().ownerReference = OwnerBody.NetworkObject;
+            no.GetComponent<ProjectileContext>().OwnerObject = OwnerBody.NetworkObject;
             no.SpawnWithOwnership(OwnerClientId);
             audioSource.Play();
             muzzleFlash.Play();

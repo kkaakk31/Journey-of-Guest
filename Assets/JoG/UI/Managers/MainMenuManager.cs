@@ -33,7 +33,7 @@ namespace JoG.UI.Managers {
         }
 
         private void LoadLobbyScene() {
-            SceneManager.LoadScene("LobbyScene");
+            SceneManager.LoadScene(2);
         }
     }
 }

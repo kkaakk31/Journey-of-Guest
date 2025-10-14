@@ -47,6 +47,7 @@ namespace JoG.Buffs {
 
         protected override void MergeWith(BleedingBuff buff) {
             damageCount += buff.damageCount;
+            damageValuePerTick += buff.damageValuePerTick;
         }
 
         protected override void OnTick() {

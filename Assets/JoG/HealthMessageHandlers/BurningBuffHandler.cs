@@ -7,7 +7,7 @@ using UnityEngine;
 namespace JoG.HealthMessageHandlers {
 
     public class BurningBuffHandler : DamageMessageHandler {
-        [Clamp(0.001f, 1000)] public float damageCofficient = 0.2f;
+        [Clamp(0.001f, 1000)] public float damageCofficient = 0.5f;
         public ushort damageCount = 5;
         [SerializeField, Required] private HealthMessageProcessor _processor;
 
@@ -16,6 +16,9 @@ namespace JoG.HealthMessageHandlers {
                 var buff = BuffPool.Rent<BurningBuff>();
                 buff.attacker = message.attacker;
                 buff.damageValuePerTick = (uint)(message.value * damageCofficient);
+                if (buff.damageValuePerTick < 1) {
+                    buff.damageValuePerTick = 1;
+                }
                 buff.damageCount = damageCount;
                 _processor.AddBuff(buff);
             }

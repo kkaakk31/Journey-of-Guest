@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace JoG.Character {
 
-    public class ItemUser : MonoBehaviour, IItemPickUpController {
+    public class ItemUser : MonoBehaviour, IItemPickUpController { 
         private InventoryItem currentItem;
         private NetworkObject currentItemObject;
         public List<IItemHandler> Handlers { get; private set; }
@@ -36,18 +36,21 @@ namespace JoG.Character {
                 }
             }
             NetworkObject spawned = null;
+            GameObject spawnedObject = null;
             if (item.Prefab != null && item.Prefab.TryGetComponent(out NetworkObject prefab)) {
                 spawned = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(prefab, destroyWithScene: true);
+                spawnedObject = spawned.gameObject;
             }
             currentItemObject = spawned;
             foreach (var handler in Handlers.AsSpan()) {
-                handler.Handle(spawned.gameObject);
+                handler.Handle(spawnedObject);
             }
         }
 
         void IInteractionMessageHandler.Handle(IInteractable interactableObject) {
             if (interactableObject is PickupItem pickupItem) {
                 Controller.AddItem(pickupItem.itemData, pickupItem.count);
+                pickupItem.count = 0;
             }
         }
 

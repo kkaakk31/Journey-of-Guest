@@ -34,6 +34,7 @@ namespace JoG.ObjectPool {
         public GameObject Rent(in Vector3 position, in Quaternion rotation, Transform parent) {
             if (pool.TryPop(out var result)) {
                 result.transform.SetPositionAndRotation(position, rotation);
+                result.transform.SetParent(parent);
             } else {
                 result = Instantiate(Prefab, position, rotation, parent);
             }

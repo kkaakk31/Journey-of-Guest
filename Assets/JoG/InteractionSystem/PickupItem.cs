@@ -1,20 +1,27 @@
-﻿using JoG.Character;
+﻿using EditorAttributes;
+using JoG.Character;
 using JoG.InventorySystem;
 using Unity.Netcode;
 
 namespace JoG.InteractionSystem {
 
-    public class PickupItem : InteractableObject {
-        public bool destroyAfterPickup;
-        public ItemData itemData;
+    public class PickupItem : NetworkBehaviour, IInteractable, IInformationProvider {
+        [PropertyDropdown, Required] public ItemData itemData;
         public byte count = 1;
+        public string Name => itemData?.Name;
 
-        public override bool CanInteract(Interactor interactor) {
+        public string Description => itemData?.Description;
+
+        public bool CanInteract(Interactor interactor) {
             return interactor.TryGetComponent<IItemPickUpController>(out _);
         }
 
-        public override void PreformInteraction(Interactor interactor) {
-            if (destroyAfterPickup) {
+        public string GetProperty(string key) {
+            throw new System.NotImplementedException();
+        }
+
+        public void PreformInteraction(Interactor interactor) {
+            if (count == 0) {
                 NetworkObject.Despawn();
             }
         }

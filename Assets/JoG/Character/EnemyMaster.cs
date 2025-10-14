@@ -1,8 +1,6 @@
-﻿using EditorAttributes;
-using JoG.DebugExtensions;
+﻿using JoG.DebugExtensions;
 using JoG.Messages;
 using RandomElementsSystem.Types;
-using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -61,7 +59,9 @@ namespace JoG.Character {
                         this.Log("Enemy has no more lives. Despawning.");
                     } else {
                         this.Log($"Enemy lost a life. Remaining lives: {lifeCount}");
-                        SpawnBody();
+                        if (HasAuthority) {
+                            SpawnBody();
+                        }
                     }
                 }
             }
