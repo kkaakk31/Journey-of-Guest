@@ -1,9 +1,9 @@
-﻿using JoG.Attributes;
+﻿using GuestUnion.Utilities.YooAsset;
+using JoG.Attributes;
 using JoG.BuffSystem;
 using JoG.Localization;
 using Unity.Netcode;
 using UnityEngine;
-using YooAsset;
 
 namespace JoG.Buffs {
 
@@ -17,11 +17,11 @@ namespace JoG.Buffs {
         public ushort damageCount;
 
         [FromAsset("BurningSprite")]
-        private static AssetHandle iconSprite;
+        private static Sprite iconSprite;
 
         public uint TotalDamage => damageValuePerTick * damageCount;
 
-        public override Sprite IconSprite => iconSprite.GetAssetObject<Sprite>();
+        public override Sprite IconSprite => iconSprite;
 
         public override string Name => Localizer.GetString("buff.burning.name");
 

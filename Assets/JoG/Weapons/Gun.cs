@@ -1,8 +1,7 @@
-﻿using EditorAttributes;
-using GuestUnion;
+﻿using GuestUnion;
+using GuestUnion.Extensions.Unity;
 using JoG.Character;
 using JoG.InteractionSystem;
-using JoG.InventorySystem;
 using JoG.Projectiles;
 using JoG.Weapons.Datas;
 using JoG.Weapons.Magazines;
@@ -17,7 +16,7 @@ namespace JoG.Weapons {
         SemiAutomatic,
     }
 
-    public class Gun : NetworkBehaviour, IGun, IInteractable, IItem {
+    public class Gun : NetworkBehaviour, IGun, IInteractable {
         public const float MAX_PASSED_TIME = 0.3f;
         public FireMode fireMode;
         public Magazine magazine = new(30);
@@ -42,8 +41,6 @@ namespace JoG.Weapons {
 
             set => ownerBody.Value = value;
         }
-
-        public ItemData ItemData => throw new NotImplementedException();
 
         public Vector2 GetRandomSpread() => (1 - Mathf.Min(1, (Time.time - nextFireTime) / Data.timeOfStabilizing)) * Data.RandomSpread;
 

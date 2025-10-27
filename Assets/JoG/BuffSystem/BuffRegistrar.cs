@@ -82,7 +82,7 @@ namespace JoG.BuffSystem {
             while (buffRootType.BaseType != rootType) {
                 buffRootType = buffRootType.BaseType;
             }
-            return buffRootType.GetField("index", buffIndexFieldBindingFlags);
+            return buffRootType.GetField("index" , buffIndexFieldBindingFlags);
         }
     }
 }

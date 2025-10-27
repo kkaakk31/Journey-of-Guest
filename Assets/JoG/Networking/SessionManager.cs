@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using GuestUnion;
+using GuestUnion.Extensions;
 using System;
 using System.Linq;
 using Unity.Netcode;
@@ -19,6 +19,7 @@ namespace JoG.Networking {
         private IQosService _qosService;
         public string SessionName => _session?.Name;
         public string SessionCode => _session?.Code;
+        public IPlayer CurrentPlayer => _session?.CurrentPlayer;
 
         public SessionManager(NetworkManager networkManager,
             IMultiplayerService multiplayerService,
@@ -110,11 +111,16 @@ namespace JoG.Networking {
 
         async void IDisposable.Dispose() {
             await LeaveSessionAsync();
-            if (_networkManager) {
+            if (_networkManager != null) {
                 _networkManager.OnConnectionEvent -= OnConnectionEvent;
                 _networkManager.OnClientStopped -= OnLocalClientStopped;
                 _networkManager.OnSessionOwnerPromoted -= OnSessionOwnerPromoted;
             }
+        }
+
+        public async UniTask SaveCurrentPlayerDataAsync() {
+            if (_session is null) return;
+            await _session.SaveCurrentPlayerDataAsync();
         }
 
         private async UniTask<string> GetLowestLatencyRegionAsync() {

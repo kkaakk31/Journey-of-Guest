@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using EditorAttributes;
-using JoG.DebugExtensions;
+using GuestUnion.Extensions.Unity;
 using JoG.Localization;
 using System;
 using TMPro;

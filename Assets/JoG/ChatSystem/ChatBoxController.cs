@@ -1,5 +1,7 @@
 ﻿using EditorAttributes;
 using GuestUnion;
+using GuestUnion.Extensions;
+using GuestUnion.Extensions.Unity;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using UnityEngine;

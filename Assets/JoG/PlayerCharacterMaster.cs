@@ -1,7 +1,6 @@
-﻿using JoG.Character;
-using JoG.Messages;
-using JoG.UI;
-using JoG.UI.Controllers;
+﻿using GuestUnion.Extensions;
+using GuestUnion.ObjectPool.Generic;
+using JoG.Character;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -15,14 +14,21 @@ namespace JoG {
     public class PlayerCharacterMaster : CharacterMaster {
         private static readonly List<PlayerCharacterMaster> _players = new();
         private readonly NetworkVariable<FixedString32Bytes> _playerName = new(writePerm: NetworkVariableWritePermission.Owner);
-        public static ReadOnlySpan<PlayerCharacterMaster> Players => _players.AsSpan();
-        [field: SerializeField] public CharacterNameplate Nameplate { get; private set; }
-        [field: SerializeField] public CharacterViewController ViewController { get; private set; }
+
+        [SerializeField] private GameObject _localPlayerHUDPrefab;
+        [SerializeField] private GameObject _remotePlayerHUDPrefab;
+        private GameObject _playerHUD;
+        public static ReadOnlySpan<PlayerCharacterMaster> Players => _players.AsReadOnlySpan();
 
         /// <summary>Write: Owner Only.</summary>
         public string PlayerName {
             get => _playerName.Value.ToString();
             set => _playerName.Value = value;
+        }
+
+        public event NetworkVariable<FixedString32Bytes>.OnValueChangedDelegate OnPlayerNameChanged {
+            add => _playerName.OnValueChanged += value;
+            remove => _playerName.OnValueChanged -= value;
         }
 
         public static bool FindPlayer(string playerName, out PlayerCharacterMaster result) {
@@ -37,7 +43,7 @@ namespace JoG {
         }
 
         public void SpawnBody(NetworkObject bodyPrefab, in Vector3 position, in Quaternion rotation) {
-            if (Body != null) {
+            if (AttachedBody != null) {
                 Debug.LogWarning("Player already has a body. Cannot spawn another one.");
                 return;
             }
@@ -57,30 +63,42 @@ namespace JoG {
         public override void OnNetworkSpawn() {
             base.OnNetworkSpawn();
             _players.Add(this);
-            ViewController.enabled = !IsLocalPlayer;
         }
 
         public override void OnNetworkDespawn() {
             base.OnNetworkDespawn();
             _players.Remove(this);
-            ViewController.enabled = false;
         }
 
-        public override void OnBodyChanged(in CharacterBodyChangedMessage message) {
-            base.OnBodyChanged(message);
-            if (message.changeType is CharacterBodyChangeType.Get) {
-                message.body.tag = tag;
+        protected override void OnBodyAttach(CharacterBody body) {
+            body.tag = tag;
+            if (_playerHUD == null) {
+                if (IsLocalPlayer) {
+                    _playerHUD = Instantiate(_localPlayerHUDPrefab, transform);
+                } else {
+                    _playerHUD = Instantiate(_remotePlayerHUDPrefab, transform);
+                }
+                using (ListPool<IBodyAttachHandler>.Rent(out var list)) {
+                    _playerHUD.GetComponentsInChildren(true, list);
+                    foreach (var handler in list) {
+                        OnBodyAttached.AddListener(handler.OnBodyAttached);
+                        OnBodyDetached.AddListener(handler.OnBodyDetached);
+                    }
+                }
+                using (ListPool<Canvas>.Rent(out var list)) {
+                    var uiCamera = Camera.allCameras.Find(c => c.CompareTag("UICamera"));
+                    _playerHUD.GetComponentsInChildren(true, list);
+                    foreach (var canvas in list) {
+                        canvas.worldCamera = uiCamera;
+                    }
+                }
             }
+            _playerHUD.SetActive(true);
         }
 
-        protected void Awake() {
-            _playerName.OnValueChanged = (oldValue, newValue) => {
-                Nameplate.NameplateText = newValue.ToString();
-            };
-        }
-
-        protected override void OnNetworkSessionSynchronized() {
-            Nameplate.NameplateText = PlayerName;
+        protected override void OnBodyDetach(CharacterBody body) {
+            base.OnBodyDetach(body);
+            _playerHUD.SetActive(false);
         }
     }
 }

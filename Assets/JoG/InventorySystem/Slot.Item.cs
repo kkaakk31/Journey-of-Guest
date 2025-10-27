@@ -1,46 +1,57 @@
-﻿using UnityEngine;
+﻿using GuestUnion.Extensions;
+using JoG.Item.Datas;
 
 namespace JoG.InventorySystem {
 
     public partial class Slot : IItemSlot {
         private ItemData _itemData;
-        private short _itemCount;
+        private int _itemCount;
 
         public ItemData ItemData {
             get => _itemData;
             set {
                 _itemData = value;
-                iconImage.sprite = value == null ? null : value.iconSprite;
+                if (value == null) {
+                    _itemCount = 0;
+                    countText.gameObject.SetActive(false);
+                    iconImage.gameObject.SetActive(false);
+                } else {
+                    iconImage.gameObject.SetActive(true);
+                    iconImage.sprite = value.iconSprite;
+                }
             }
         }
 
-        public short Count {
+        public int ItemCount {
             get => _itemCount;
             set {
-                _itemCount = value;
-                countText.text = value > 1 ? value.ToString() : string.Empty;
-                iconObject.SetActive(value > 0);
+                if (_itemData == null) {
+                    return;
+                }
+                _itemCount = value.Clamp(0, _itemData.maxStack);
+                if (_itemCount > 1) {
+                    countText.gameObject.SetActive(true);
+                    countText.text = _itemCount.ToString();
+                    return;
+                }
+                countText.gameObject.SetActive(false);
+                if (_itemCount == 0) {
+                    _itemData = null;
+                    iconImage.gameObject.SetActive(false);
+                }
             }
         }
-
-        public string Name => _itemData?.Name;
-
-        public string Description => _itemData?.Description;
-
-        public Sprite IconSprite => _itemData?.iconSprite;
-
-        public GameObject Prefab => _itemData?.prefab;
+        public bool IsEmpty => _itemCount is 0 || _itemData == null;
 
         public int Index { get; set; }
 
-        public void Set(ItemData itemData = null, short itemCount = 0) {
-            ItemData = itemData;
-            Count = itemCount;
-        }
-
-        public void Exchange(in IItemSlot other) {
-            (other.ItemData, ItemData) = (ItemData, other.ItemData);
-            (other.Count, Count) = (Count, other.Count);
+        public void Exchange(IItemSlot other) {
+            var tmp = ItemData;
+            var tmp2 = ItemCount;
+            ItemData = other.ItemData;
+            ItemCount = other.ItemCount;
+            other.ItemData = tmp;
+            other.ItemCount = tmp2;
         }
     }
 }

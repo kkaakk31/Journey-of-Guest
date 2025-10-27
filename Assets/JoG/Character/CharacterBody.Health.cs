@@ -58,6 +58,11 @@ namespace JoG.Character {
 
         public float PercentHp => (float)_hp.Value / _maxHP.Value;
 
+        public event NetworkVariable<uint>.OnValueChangedDelegate OnHPChanged {
+            add => _hp.OnValueChanged += value;
+            remove => _hp.OnValueChanged -= value;
+        }
+
         public event DamageMessageModifier OnModifyDamageMessage {
             add => _damageMessageModifiers.Add(value);
             remove => _damageMessageModifiers.Remove(value);
@@ -96,8 +101,10 @@ namespace JoG.Character {
             if (damageReport.deltaDamage >= HP) {
                 damageReport.deltaDamage = HP;
                 HP = 0;
+                damageReport.killed = true;
             } else {
                 HP -= damageReport.deltaDamage;
+                damageReport.killed = false;
             }
             foreach (var handler in _damageReportHandlers.AsSpan()) {
                 handler(damageReport);

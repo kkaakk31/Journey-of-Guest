@@ -1,22 +1,23 @@
 ﻿using EditorAttributes;
+using GuestUnion.TooltipSystem;
+using GuestUnion.TooltipSystem.Components;
 using JoG.InteractionSystem;
 using JoG.Localization;
 using UnityEngine;
 
 namespace JoG.Audio {
 
-    public class RadioController : MonoBehaviour, IInteractable, IInformationProvider {
+    public class RadioController : MonoBehaviour, IInteractable, ITooltipSource {
         [SerializeField, Required] private NetworkAudioSource _audioSource;
         public string Name => Localizer.GetString("radio.name");
 
         public string Description => Localizer.GetString("radio.desc");
 
-        public bool CanInteract(Interactor interactor) {
-            return true;
+        void ITooltipSource.BuildTooltip(TooltipView view) {
         }
 
-        public string GetProperty(string key) {
-            return Localizer.GetString(key);
+        public bool CanInteract(Interactor interactor) {
+            return true;
         }
 
         public void PreformInteraction(Interactor interactor) {

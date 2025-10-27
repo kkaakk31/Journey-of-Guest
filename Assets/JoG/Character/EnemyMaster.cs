@@ -1,6 +1,7 @@
-﻿using JoG.DebugExtensions;
-using JoG.Messages;
-using RandomElementsSystem.Types;
+﻿using GuestUnion.Extensions;
+using GuestUnion.Extensions.Unity;
+using GuestUnion.ObjectPool.Generic;
+using GuestUnion.YooAsset;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -8,24 +9,20 @@ namespace JoG.Character {
 
     public class EnemyMaster : CharacterMaster {
         public ushort lifeCount = 1;
-        [SerializeField] private NetworkObject _bodyPrefab;
-        [SerializeField] private SelectiveRandomWeightTransform _spawnPoints;
+        public YooAssetReference<GameObject> characterHUDPrefab;
+        private GameObject _characterHUD;
 
         public void SpawnBody(NetworkObject bodyPrefab, in Vector3 position, in Quaternion rotation) {
             if (!HasAuthority) {
                 this.LogError("No authority to spawn body.");
                 return;
             }
-            if (Body != null && Body.IsSpawned) {
+            if (AttachedBody != null && AttachedBody.IsSpawned) {
                 this.LogError("Body is already spawned.");
                 return;
             }
             if (bodyPrefab == null) {
-                if (_bodyPrefab == null) {
-                    this.LogError("Body prefab is not set.");
-                    return;
-                }
-                bodyPrefab = _bodyPrefab;
+                this.LogError("Body prefab is null.");
             }
             var nob = NetworkManager.SpawnManager.InstantiateAndSpawn(
                 bodyPrefab,
@@ -39,46 +36,49 @@ namespace JoG.Character {
             }
         }
 
-        public void SpawnBody() {
-            var spawnPoint = transform;
-            if (_spawnPoints != null) {
-                spawnPoint = _spawnPoints.GetRandomValue();
-            }
-            spawnPoint.GetPositionAndRotation(out var position, out var rotation);
-            SpawnBody(_bodyPrefab, position, rotation);
-        }
-
-        public override void OnBodyChanged(in CharacterBodyChangedMessage message) {
-            base.OnBodyChanged(message);
-            if (NetworkManager.ShutdownInProgress) return;
-            if (message.changeType is CharacterBodyChangeType.Get) {
-                message.body.tag = tag;
-            } else if (message.changeType is CharacterBodyChangeType.Lose) {
-                if (lifeCount > 0) {
-                    if (--lifeCount == 0) {
-                        this.Log("Enemy has no more lives. Despawning.");
-                    } else {
-                        this.Log($"Enemy lost a life. Remaining lives: {lifeCount}");
-                        if (HasAuthority) {
-                            SpawnBody();
-                        }
+        protected override void OnBodyAttach(CharacterBody body) {
+            body.tag = tag;
+            body.OnHandleDamageReport += OnHandleDamageReport;
+            if (_characterHUD == null) {
+                _characterHUD = Instantiate(characterHUDPrefab.AssetObject, transform);
+                using (ListPool<IBodyAttachHandler>.Rent(out var list)) {
+                    _characterHUD.GetComponentsInChildren(true, list);
+                    foreach (var handler in list) {
+                        OnBodyAttached.AddListener(handler.OnBodyAttached);
+                        OnBodyDetached.AddListener(handler.OnBodyDetached);
+                    }
+                }
+                using (ListPool<Canvas>.Rent(out var list)) {
+                    var uiCamera = Camera.allCameras.Find(c => c.CompareTag("UICamera"));
+                    _characterHUD.GetComponentsInChildren(true, list);
+                    foreach (var canvas in list) {
+                        canvas.worldCamera = uiCamera;
                     }
                 }
             }
+            _characterHUD.SetActive(true);
         }
 
-        protected override void OnNetworkSessionSynchronized() {
-            if (!HasAuthority) {
-                return;
+        protected override void OnBodyDetach(CharacterBody body) {
+            body.OnHandleDamageReport -= OnHandleDamageReport;
+            _characterHUD.SetActive(false);
+        }
+
+        protected override void Awake() {
+            base.Awake();
+            characterHUDPrefab.LoadAssetSync();
+        }
+
+        private void OnHandleDamageReport(in DamageReport report) {
+            if (HasAuthority && report.killed && lifeCount > 0) {
+                lifeCount--;
+                if (lifeCount == 0) {
+                    this.Log("Enemy has no more lives.");
+                } else {
+                    this.Log($"Enemy lost a life. Remaining lives: {lifeCount}");
+                    AttachedBody.HP = AttachedBody.MaxHP;
+                }
             }
-            if (Body != null && Body.IsSpawned) {
-                return;
-            }
-            if (lifeCount == 0) {
-                this.LogWarning("Enemy has no lives left. Cannot spawn body.");
-                return;
-            }
-            SpawnBody();
         }
     }
 }

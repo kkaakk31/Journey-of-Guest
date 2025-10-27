@@ -1,5 +1,5 @@
-﻿using JoG.BuffSystem;
-using JoG.DebugExtensions;
+﻿using GuestUnion.Extensions.Unity;
+using JoG.BuffSystem;
 using System;
 using System.Buffers;
 using Unity.Netcode;
@@ -25,7 +25,7 @@ namespace JoG.Character {
                     buff.AddToOwner(this);
                 }
             } else {
-                this.LogWarning("Add buff failed! [Buff: {0}] index is out of range!", buff);
+                this.LogWarning($"Add buff failed! [Buff: {buff}] index is out of range!"  );
             }
         }
 
@@ -39,7 +39,7 @@ namespace JoG.Character {
                     BuffPool.Return(buff0);
                 }
             } else {
-                this.LogWarning("Remove buff failed! Buff [index: {0}] is out of range!", index);
+                this.LogWarning($"Remove buff failed! Buff [index: {index}] is out of range!");
             }
         }
 

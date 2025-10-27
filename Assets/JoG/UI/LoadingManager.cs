@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using EditorAttributes;
-using JoG.DebugExtensions;
+using GuestUnion.Extensions.Unity;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;

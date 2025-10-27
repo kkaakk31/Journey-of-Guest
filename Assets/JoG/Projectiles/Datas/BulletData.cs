@@ -1,5 +1,4 @@
-﻿using JoG.VisualEffects.Pools;
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace JoG.Projectiles.Datas {
@@ -12,6 +11,5 @@ namespace JoG.Projectiles.Datas {
         [Range(0, float.MaxValue)] public float speed = 100f;
         [Tooltip("不影响已激活的子弹")] public float lifetime = 1f;
         public LayerMask hitLayerMask;
-        public EffectPool impactEffectPool;
     }
 }

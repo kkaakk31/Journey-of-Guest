@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace JoG.States {
     public class GhostMainState : State {
-        [SerializeField] private RigidbodyCharacterController characterController;
+        [SerializeField] private PhysicsCharacterController characterController;
         [SerializeField] private CharacterInteractor interactor;
         [SerializeField] private CharacterBody body;
         [SerializeField] private CharacterModel model;

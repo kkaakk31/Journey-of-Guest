@@ -1,146 +1,179 @@
-using GuestUnion;
+using GuestUnion.Extensions;
+using JoG.Item.Datas;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace JoG.InventorySystem {
 
     [Serializable]
-    public class Inventory {
-        private InventoryItem[] _items;
+    public class Inventory : MonoBehaviour, IInventory {
+        private IItemSlot[] _items;
         public int Size => _items.Length;
-        public ReadOnlySpan<InventoryItem> Items => new(_items);
+        public ReadOnlySpan<IItemSlot> Items => new(_items);
+        public IItemSlot this[int index] => _items[index];
 
-        public Inventory(int size) {
-            _items = new InventoryItem[size];
-            for (var i = 0; i < size; ++i) {
-                _items[i].index = i;
-            }
+        public bool TryGetItem(int index, out IItemSlot item) => _items.TryGet(index, out item);
+
+        public int GetItemCount(int index) {
+            return _items[index].ItemCount;
         }
 
-        public ref readonly InventoryItem this[int index] => ref _items[index];
-
-        public bool TryGetItem(int index, out InventoryItem item) => _items.TryGet(index, out item);
-
-        public short GetItemCount(int index) {
-            return _items[index].count;
+        public int GetItemCount(ItemData itemData) {
+            var count = 0;
+            foreach (var item in Items) {
+                if (item.ItemData == itemData) {
+                    count += item.ItemCount;
+                }
+            }
+            return count;
         }
 
         public void ExchangeItem(int fromIndex, int toIndex) {
             if (fromIndex != toIndex) {
-                _items[fromIndex].Exchange(ref _items[toIndex]);
+                _items[fromIndex].Exchange(_items[toIndex]);
             }
         }
 
-        public void SetItemCount(int index, short count) {
-            if (count > 0) {
-                _items[index].count = count;
-            } else {
-                _items[index].Set();
-            }
+        public void SetItemCount(int index, int count) {
+            _items[index].ItemCount = count;
         }
 
-        public void RemoveItem(int index, short count) {
-            if (count <= 0) return;
-            ref var item = ref _items[index];
-            if (item.count > count) {
-                item.count -= count;
-            } else {
-                item.Set();
+        /// <returns>未成功移除的物品数量</returns>
+        public int RemoveItem(int index, int amount) {
+            if (amount <= 0) {
+                return 0;
             }
+            var item = _items[index];
+            if (item.ItemData is not null) {
+                var toRemove = Math.Min(amount, item.ItemCount);
+                item.ItemCount -= amount;
+                amount -= toRemove;
+            }
+            return amount;
         }
 
-        public void AddItem(int index, short count) {
-            if (count <= 0) return;
-            ref var item = ref _items[index];
-            if (item.data != null) {
-                item.count += count;
+        /// <returns>未成功添加到背包的物品数量</returns>
+        public int AddItem(int index, int amount) {
+            if (amount <= 0) {
+                return 0;
             }
+            var item = _items[index];
+            if (item.ItemData is not null) {
+                var remainingCount = item.ItemData.maxStack - item.ItemCount;
+                var toAdd = Math.Min(amount, remainingCount);
+                item.ItemCount += amount;
+                amount -= toAdd;
+            }
+            return amount;
         }
 
-        /// <summary>添加物品到背包中，如果背包中已存在该物品，则增加数量；如果背包中没有空位，则不添加。</summary>
+        /// <summary>添加一定数量的物品到背包中。</summary>
         /// <param name="itemData">要添加的物品</param>
-        /// <param name="count">要添加的数量</param>
-        /// <returns>添加物品在背包中的索引，如果背包已满或者添加数量为0或者物品数据为null，则返回-1</returns>
-        public int AddItem(ItemData itemData, short count) {
-            if (itemData is null || count <= 0) {
-                return -1;
+        /// <param name="amount">要添加的数量</param>
+        /// <returns>未成功添加到背包的物品数量</returns>
+        public int AddItem(ItemData itemData, int amount = 1) {
+            if (itemData is null) {
+                return amount;
             }
-            var span = new Span<InventoryItem>(_items);
-            var firstEmptyIndex = -1;
-            foreach (ref var item in span) {
-                if (item.data == itemData) {
-                    item.count += count;
-                    return item.index;
+            if (amount <= 0) {
+                return 0;
+            }
+            var span = new Span<IItemSlot>(_items);
+            foreach (var item in span) {
+                if (item.ItemData == itemData) {
+                    var remainingCount = item.ItemData.maxStack - item.ItemCount;
+                    var toAdd = Math.Min(amount, remainingCount);
+                    item.ItemCount += toAdd;
+                    amount -= toAdd;
+                    if (amount <= 0) {
+                        return 0;
+                    }
                 }
-                if (firstEmptyIndex == -1 && item.data is null) {
-                    firstEmptyIndex = item.index;
+            }
+            foreach (var item in span) {
+                if (item.ItemData is null) {
+                    var toAdd = Math.Min(amount, itemData.maxStack);
+                    item.ItemData = itemData;
+                    item.ItemCount = toAdd;
+                    amount -= toAdd;
+                    if (amount <= 0) {
+                        return 0;
+                    }
                 }
             }
-            if (firstEmptyIndex != -1) {
-                span[firstEmptyIndex].Set(itemData, count);
-            }
-            return firstEmptyIndex;
+            return amount;
         }
 
-        /// <summary>移除指定物品的数量，如果数量大于等于当前物品数量，则将该物品从背包中移除。</summary>
-        /// <param name="itemData">指定的物品</param>
-        /// <param name="count">要移除的数量</param>
-        /// <returns>移除物品在背包中的索引，未找到或者添加数量为0或者物品数据为null，则返回-1</returns>
-        public int RemoveItem(ItemData itemData, short count) {
-            if (itemData is null || count <= 0) {
-                return -1;
+        /// <summary>移除背包中指定物品。</summary>
+        /// <param name="itemData">要移除的物品</param>
+        /// <param name="amount">要移除的数量</param>
+        /// <returns>未成功移除的物品数量</returns>
+        public int RemoveItem(ItemData itemData, int amount) {
+            if (itemData is null) {
+                return amount;
+            }
+            if (amount <= 0) {
+                return 0;
             }
             foreach (ref var item in _items.AsSpan()) {
-                if (item.data == itemData) {
-                    if (item.count > count) {
-                        item.count -= count;
-                    } else {
-                        item.Set();
+                if (item.ItemData == itemData) {
+                    var toRemove = Math.Min(amount, item.ItemCount);
+                    item.ItemCount -= toRemove;
+                    amount -= toRemove;
+                    if (amount <= 0) {
+                        return 0;
                     }
-                    return item.index;
                 }
             }
-            return -1;
+            return amount;
         }
 
         public void FromJson(string json) {
             if (json.IsNullOrEmpty()) {
                 return;
             }
-            var serializedItems = JsonConvert.DeserializeObject<List<SerializedItem>>(json);
+            var serializedItems = JsonConvert.DeserializeObject<SerializedItem[]>(json);
             if (serializedItems.IsNullOrEmpty()) {
                 return;
             }
-            foreach (ref var item in serializedItems.AsSpan()) {
+            foreach (var item in new ReadOnlySpan<SerializedItem>(serializedItems)) {
                 if (item.index < 0 || item.index >= _items.Length) {
                     continue;
                 }
                 if (ItemCatalog.TryGetItemDef(item.itemToken, out var itemData)) {
-                    _items[item.index].Set(itemData, item.itemCount);
+                    _items[item.index].ItemData = itemData;
+                    _items[item.index].ItemCount = item.itemCount;
                 }
             }
         }
 
         public string ToJson() {
-            var itemDataList = new List<SerializedItem>();
-            foreach (ref readonly var item in new ReadOnlySpan<InventoryItem>(_items)) {
-                if (item.count > 0 && item.data != null) {
-                    itemDataList.Add(new SerializedItem {
-                        itemToken = item.data.nameToken,
-                        itemCount = item.count,
-                        index = item.index
-                    });
+            var itemDataList = new SerializedItem[_items.Length];
+            foreach (var item in new ReadOnlySpan<IItemSlot>(_items)) {
+                if (item.ItemData is not null) {
+                    itemDataList[item.Index] = new SerializedItem {
+                        itemToken = item.ItemData.nameToken,
+                        itemCount = item.ItemCount,
+                        index = item.Index
+                    };
                 }
             }
             return JsonConvert.SerializeObject(itemDataList);
         }
 
+        protected void Awake() {
+            _items = GetComponentsInChildren<IItemSlot>();
+            for (var i = 0; i < _items.Length; ++i) {
+                _items[i].Index = i;
+            }
+        }
+
         [Serializable]
         private struct SerializedItem {
             public string itemToken;
-            public short itemCount;
+            public int itemCount;
             public int index;
         }
     }

@@ -1,5 +1,5 @@
 using EditorAttributes;
-using JoG.UnityObjectExtensions;
+using GuestUnion.Extensions.Unity;
 using Steamworks;
 using TMPro;
 using UnityEngine;

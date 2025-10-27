@@ -1,3 +1,4 @@
+using GuestUnion.TooltipSystem.Components;
 using JoG.InteractionSystem;
 using Unity.Netcode;
 using UnityEngine.SceneManagement;
@@ -21,6 +22,9 @@ namespace JoG {
 
         public override void PreformInteraction(Interactor interactor) {
             Activate();
+        }
+
+        public override void BuildTooltip(TooltipView view) {
         }
     }
 }

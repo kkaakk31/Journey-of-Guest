@@ -1,6 +1,4 @@
 using JoG.Character.InputBanks;
-using JoG.DebugExtensions;
-using JoG.Messages;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -37,22 +35,15 @@ namespace JoG.Character {
         public CharacterModel Model => _model;
 
         public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject) {
-            this.Log("角色身体的父级发生了变化！[Parent: {0}]", parentNetworkObject);
             if (_master != null) {
-                _master.OnBodyChanged(new CharacterBodyChangedMessage {
-                    changeType = CharacterBodyChangeType.Lose,
-                    body = this
-                });
+                _master.DetachBody(this);
             }
             if (parentNetworkObject is null) {
                 _master = null;
                 return;
             }
             if (parentNetworkObject.TryGetComponent(out _master)) {
-                _master.OnBodyChanged(new CharacterBodyChangedMessage {
-                    changeType = CharacterBodyChangeType.Get,
-                    body = this
-                });
+                _master.AttachBody(this);
             }
         }
 
@@ -67,16 +58,13 @@ namespace JoG.Character {
         public override void OnNetworkDespawn() {
             DeinitializeBuff();
             if (_master != null) {
-                _master.OnBodyChanged(new CharacterBodyChangedMessage {
-                    changeType = CharacterBodyChangeType.Lose,
-                    body = this
-                });
+                _master.DetachBody(this);
                 _master = null;
             }
         }
 
         public T GetInputBank<T>(string name) where T : InputBank, new() {
-            //ref var inputBankRef = ref _nameToInputBank.GetValueRefOrAddDefault(name, out var exists);
+            //ref var inputBankRef = ref _nameToInputBank.InternalGetValueRefOrAddDefault(name, out var exists);
             //if (exists) {
             //    return inputBankRef as T;
             //} else {

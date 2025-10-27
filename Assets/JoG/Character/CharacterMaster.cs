@@ -1,44 +1,54 @@
-﻿using EditorAttributes;
-using JoG.Messages;
-using MessagePipe;
+﻿using GuestUnion.Extensions.Unity;
 using Unity.Netcode;
 using UnityEngine;
-using VContainer;
+using UnityEngine.Events;
 
 namespace JoG.Character {
 
     [DisallowMultipleComponent]
     public class CharacterMaster : NetworkBehaviour {
-        [Inject] private IBufferedPublisher<CharacterBodyChangedMessage> _publisher;
+        [field: SerializeField] public UnityEvent<CharacterBody> OnBodyAttached { get; private set; }
+        [field: SerializeField] public UnityEvent<CharacterBody> OnBodyDetached { get; private set; }
 
-        public CharacterBody Body { get; private set; }
+        public CharacterBody AttachedBody { get; private set; }
 
-        public virtual void OnBodyChanged(in CharacterBodyChangedMessage message) {
-            Body = message.body;
-            _publisher.Publish(message);
+        public void AttachBody(CharacterBody body) {
+            if (body == null) {
+                this.LogError("body to attach is null");
+                return;
+            }
+            if (AttachedBody != null) {
+                this.LogError("this master has already attached to a body");
+                return;
+            }
+            AttachedBody = body;
+            OnBodyAttach(body);
+            OnBodyAttached.Invoke(body);
         }
 
-        //protected virtual void OnTransformChildrenChanged() {
-        //    var body = GetComponentInChildren<CharacterBody>();
-        //    if (Body == body) return;
-        //    if (Body != null) {
-        //        var message = new CharacterBodyChangedMessage {
-        //            changeType = CharacterBodyChangeType.Lose,
-        //            body = Body,
-        //        };
-        //        Body = null;
-        //        _publisher.Publish(message);
-        //        OnBodyChanged(message);
-        //    }
-        //    Body = body;
-        //    if (body != null) {
-        //        var message = new CharacterBodyChangedMessage {
-        //            changeType = CharacterBodyChangeType.Get,
-        //            body = body,
-        //        };
-        //        _publisher.Publish(message);
-        //        OnBodyChanged(message);
-        //    }
-        //}
+        public void DetachBody(CharacterBody body) {
+            if (body == null) {
+                this.LogError("body to detach is null");
+                return;
+            }
+            if (AttachedBody != body) {
+                this.LogError("body to detach has not attached to this master");
+                return;
+            }
+            AttachedBody = null;
+            OnBodyDetach(body);
+            OnBodyDetached.Invoke(body);
+        }
+
+        protected virtual void OnBodyAttach(CharacterBody body) {
+        }
+
+        protected virtual void OnBodyDetach(CharacterBody body) {
+        }
+
+        protected virtual void Awake() {
+            OnBodyAttached ??= new();
+            OnBodyDetached ??= new();
+        }
     }
 }

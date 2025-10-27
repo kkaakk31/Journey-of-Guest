@@ -1,128 +1,52 @@
 ﻿using EditorAttributes;
 using JoG.Character;
-using JoG.Messages;
-using MessagePipe;
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
-using VContainer;
 
 namespace JoG.InventorySystem {
 
-    public class InventoryController : MonoBehaviour, IMessageHandler<CharacterBodyChangedMessage> {
-        public Inventory inventory;
-        public InputActionReference numberInput;
-        public int selectedIndex = 0;
-        [Required] public InventoryView view;
+    public class InventoryController : MonoBehaviour,IBodyAttachHandler {
+        [ReadOnly] public int selectedIndex = 0;
+        [SerializeField, Required] private InputActionReference _numberInput;
+        [SerializeField, Required] private InputActionReference _tableToggle;
+        [SerializeField, Required] private InventoryTableView _tableView;
         private CharacterBody _body;
-        private IDisposable _disposable;
-        private ItemUser _itemUser;
+        private IInventory _inventory;
+        private IItemUser _itemUser;
 
-        [Button]
-        public int AddItem(string itemName, int count) {
-            if (ItemCatalog.TryGetItemDef(itemName, out var itemData)) {
-                var index = inventory.AddItem(itemData, (short)count);
-                view.RefreshSlot(index);
-                return index;
-            } else {
-                return -1;
-            }
-        }
-
-        [Button]
-        public void ExchangeItem(int fromIndex, int toIndex) {
-            inventory.ExchangeItem(fromIndex, toIndex);
-            view.RefreshSlot(fromIndex);
-            view.RefreshSlot(toIndex);
-            if (selectedIndex == fromIndex || selectedIndex == toIndex) {
+        public void OnBodyAttached(CharacterBody body) {
+            _body = body;
+            if (_body.TryGetComponent(out _itemUser)) {
+                _itemUser.Inventory = _inventory;
                 SelectItem(selectedIndex);
             }
+            _numberInput.action.performed += OnNumInput;
+            _tableToggle.action.performed += OnTableToggle;
+            _numberInput.action.Enable();
+            _tableToggle.action.Enable();
         }
 
-        [Inject]
-        public void Construct(IBufferedSubscriber<CharacterBodyChangedMessage> subscriber) {
-            _disposable = subscriber.Subscribe(this);
-        }
-
-        void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
-            _body = message.body;
-            if (message.changeType is CharacterBodyChangeType.Get && _body.TryGetComponent(out _itemUser)) {
-                enabled = true;
-                view.enabled = true;
-                _itemUser.Controller = this;
-                SelectItem(selectedIndex);
-            } else {
-                enabled = false;
-                view.enabled = false;
-                if (_itemUser != null) {
-                    _itemUser.Controller = null;
-                }
-                _itemUser = null;
+        public void OnBodyDetached(CharacterBody body) {
+            _body = null;
+            if (_itemUser != null) {
+                _itemUser.Inventory = null;
             }
-        }
-
-        public int AddItem(ItemData item, short count) {
-            var index = inventory.AddItem(item, count);
-            view.RefreshSlot(index);
-            if (index == selectedIndex) {
-                SelectItem(index);
-            }
-            return index;
-        }
-
-        public void AddItem(int index, short count) {
-            inventory.AddItem(index, count);
-            view.RefreshSlot(index);
-            if (index == selectedIndex) {
-                SelectItem(index);
-            }
-        }
-
-        public void RemoveItem(int index, short count) {
-            inventory.RemoveItem(index, count);
-            view.RefreshSlot(index);
-            if (index == selectedIndex) {
-                SelectItem(index);
-            }
-        }
-
-        public int RemoveItem(ItemData item, short count) {
-            var index = inventory.RemoveItem(item, count);
-            view.RefreshSlot(index);
-            if (index == selectedIndex) {
-                SelectItem(index);
-            }
-            return index;
+            _itemUser = null;
+            _numberInput.action.performed -= OnNumInput;
+            _tableToggle.action.performed -= OnTableToggle;
+            _numberInput.action.Disable();
+            _tableToggle.action.Disable();
         }
 
         public void SelectItem(int index) {
             selectedIndex = index;
-            _itemUser.Use(inventory[index]);
-            view.HighlightSlot(index);
+            _itemUser.Use(_inventory[index]);
+            //view.HighlightSlot(index);
         }
 
-        private void Awake() {
-            inventory = new Inventory(60);
-            var inventoryJson = PlayerPrefs.GetString("player_inventory", string.Empty);
-            inventory.FromJson(inventoryJson);
-        }
-
-        private void OnEnable() {
-            numberInput.action.performed += OnNumInput;
-            numberInput.action.Enable();
-            view.RefreshAllSlots();
-        }
-
-        private void OnDisable() {
-            numberInput.action.performed -= OnNumInput;
-            numberInput.action.Disable();
-        }
-
-        private void OnDestroy() {
-            PlayerPrefs.SetString("player_inventory", inventory.ToJson());
-            PlayerPrefs.Save();
-            _disposable?.Dispose();
+        protected void Awake() {
+            _inventory = GetComponent<Inventory>();
         }
 
         private void OnNumInput(InputAction.CallbackContext context) {
@@ -151,6 +75,14 @@ namespace JoG.InventorySystem {
             }
             if (idx >= 0) {
                 SelectItem(idx);
+            }
+        }
+
+        private void OnTableToggle(InputAction.CallbackContext callback) {
+            if (_tableView.IsVisible) {
+                _tableView.Hide();
+            } else {
+                _tableView.Show();
             }
         }
     }

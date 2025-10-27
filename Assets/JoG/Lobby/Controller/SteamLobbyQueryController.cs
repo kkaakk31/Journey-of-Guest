@@ -1,5 +1,5 @@
-using GuestUnion;
-using JoG.DebugExtensions;
+using GuestUnion.Extensions;
+using GuestUnion.Extensions.Unity;
 using JoG.Lobby.View;
 using Steamworks;
 using Steamworks.Data;
@@ -72,7 +72,7 @@ namespace JoG.Lobby.Controller {
             if (HasFriendFilter) {
                 _lobbies.RemoveAll(lobby => !lobby.Members.Any(f => f.IsFriend));
             }
-            this.Log("Lobbies found: {0}", _lobbies.Count);
+            this.Log($"Lobbies found: {_lobbies.Count}");
             await SteamNetworkingUtils.WaitForPingDataAsync();
             RefreshView();
             isRefreshing = false;

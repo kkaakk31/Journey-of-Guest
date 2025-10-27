@@ -1,4 +1,4 @@
-﻿using GuestUnion;
+﻿using GuestUnion.Extensions;
 using GuestUnion.ObjectPool.Generic;
 using System;
 using System.Buffers;

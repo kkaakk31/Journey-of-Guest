@@ -1,9 +1,8 @@
-﻿using JoG.Attributes;
+﻿using GuestUnion.Utilities.YooAsset;
 using JoG.BuffSystem;
 using System;
 using Unity.Netcode;
 using UnityEngine;
-using YooAsset;
 
 namespace JoG.Buffs {
 
@@ -14,12 +13,12 @@ namespace JoG.Buffs {
         public ushort healCount;
 
         [FromAsset("HealingSprite")]
-        private static AssetHandle iconSprite;
+        private static Sprite iconSprite;
 
         public uint TotalHealAmount => healAmountPerTick * healCount;
         public override EBuffType Type => EBuffType.Healing;
 
-        public override Sprite IconSprite => iconSprite.GetAssetObject<Sprite>();
+        public override Sprite IconSprite => iconSprite;
 
         public override string Name => nameof(HealingBuff);
 

@@ -1,7 +1,6 @@
 ﻿using EditorAttributes;
-using JoG.ObjectPool;
+using GuestUnion.ObjectPool.Unity;
 using Unity.Netcode;
-using UnityEngine;
 
 namespace JoG.Projectiles {
 

@@ -1,4 +1,6 @@
-﻿using JoG.DebugExtensions;
+﻿using GuestUnion.Extensions.Unity;
+using GuestUnion.TooltipSystem;
+using GuestUnion.TooltipSystem.Components;
 using JoG.InteractionSystem;
 using JoG.Localization;
 using Unity.Netcode;
@@ -6,7 +8,7 @@ using UnityEngine;
 
 namespace JoG.Character {
 
-    public class CharacterSelectable : MonoBehaviour, IInteractable, IInformationProvider {
+    public class CharacterSelectable : MonoBehaviour, IInteractable, ITooltipSource {
         public LocalizableString localizableName;
         public LocalizableString localizableDescription;
         [SerializeField] private NetworkObject bodyPrefab;
@@ -14,8 +16,8 @@ namespace JoG.Character {
 
         public string Description => localizableDescription.Value;
 
-        public string GetProperty(string key) {
-            return Localizer.GetString(key);
+        void ITooltipSource.BuildTooltip(TooltipView view) {
+            throw new System.NotImplementedException();
         }
 
         public bool CanInteract(Interactor interactor) {

@@ -1,4 +1,4 @@
-﻿using JoG.DebugExtensions;
+﻿using GuestUnion.Extensions.Unity;
 using Netcode.Transports.Facepunch;
 using Steamworks;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ namespace JoG.Lobby.Controller {
         public byte MaxMembers {
             get => (byte)currentLobby.MaxMembers;
             set {
-                currentLobby.MaxMembers = value; 
+                currentLobby.MaxMembers = value;
                 //facepunchTransport.cl(value);
             }
         }
@@ -167,9 +167,9 @@ namespace JoG.Lobby.Controller {
         private void OnLobbyEntered(SLobby lobby) {
             if (currentLobby.Id.IsValid) {
                 currentLobby.Leave();
-                this.Log("Leaved lobby: {0}", currentLobby.Id);
+                this.Log($"Leaved lobby: {currentLobby.Id}");
             }
-            this.Log("Joined lobby: {0}", lobby.Id);
+            this.Log($"Joined lobby: {lobby.Id}");
             currentLobby = lobby;
             if (!lobby.Owner.IsMe) {
                 //multipass.SwitchTransport(1);

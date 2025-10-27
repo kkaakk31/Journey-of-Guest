@@ -1,14 +1,14 @@
-﻿using JoG.Character.InputBanks;
-using JoG.Messages;
-using MessagePipe;
-using System;
+﻿using EditorAttributes;
+using JoG.Character;
+using JoG.Character.InputBanks;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using VContainer;
 
 namespace JoG {
 
-    public class PlayerCharacterInputer : MonoBehaviour, IMessageHandler<CharacterBodyChangedMessage> {
+    public class PlayerCharacterInputer : MonoBehaviour, IBodyAttachHandler {
+        public LayerMask aimCollisionFilter;
         private BooleanInputBank sprintInputBank;
         private TriggerInputBank interactInputBank;
         private TriggerInputBank jumpInputBank;
@@ -24,39 +24,41 @@ namespace JoG {
         private InputAction _sprint;
         private InputAction _skill;
         private InputAction _interact;
-        private IDisposable _disposable;
-        private int _enableInputCount;
+        private Vector3InputBank _aimInputBank;
+        [field: SerializeField, Required] public CinemachineCamera PlayerCharacterCamera { get; private set; }
 
-        void IMessageHandler<CharacterBodyChangedMessage>.Handle(CharacterBodyChangedMessage message) {
-            var body = message.body;
-            if (message.changeType is CharacterBodyChangeType.Get) {
-                interactInputBank = body.GetInputBank<TriggerInputBank>("Interact");
-                jumpInputBank = body.GetInputBank<TriggerInputBank>("Jump");
-                moveInputBank = body.GetInputBank<Vector3InputBank>("Move");
-                primaryActionInputBank = body.GetInputBank<TriggerInputBank>("PrimaryAction");
-                secondaryActionInputBank = body.GetInputBank<TriggerInputBank>("SecondaryAction");
-                skillInputBank = body.GetInputBank<TriggerInputBank>("Skill");
-                sprintInputBank = body.GetInputBank<BooleanInputBank>("Sprint");
-                RegisterCallback();
-                CharacterInputManager.Instance.EnableInput();
-                CursorManager.Instance.HideCursor();
-            } else if (message.changeType is CharacterBodyChangeType.Lose) {
-                interactInputBank = null;
-                jumpInputBank = null;
-                moveInputBank = null;
-                primaryActionInputBank = null;
-                secondaryActionInputBank = null;
-                skillInputBank = null;
-                sprintInputBank = null;
-                UnregisterCallback();
-                CharacterInputManager.Instance.DisableInput();
-                CursorManager.Instance.ShowCursor();
-            }
+        public void OnBodyAttached(CharacterBody body) {
+            interactInputBank = body.GetInputBank<TriggerInputBank>("Interact");
+            jumpInputBank = body.GetInputBank<TriggerInputBank>("Jump");
+            moveInputBank = body.GetInputBank<Vector3InputBank>("Move");
+            primaryActionInputBank = body.GetInputBank<TriggerInputBank>("PrimaryAction");
+            secondaryActionInputBank = body.GetInputBank<TriggerInputBank>("SecondaryAction");
+            skillInputBank = body.GetInputBank<TriggerInputBank>("Skill");
+            sprintInputBank = body.GetInputBank<BooleanInputBank>("Sprint");
+            _aimInputBank = body.GetInputBank<Vector3InputBank>("Aim");
+            RegisterCallback();
+            CharacterInputManager.Instance.EnableInput();
+            CursorManager.Instance.HideCursor();
+            enabled = true;
         }
 
-        [Inject]
-        private void Construct(InputActionAsset inputActionAsset, IBufferedSubscriber<CharacterBodyChangedMessage> subscriber) {
-            _characterActionMap = inputActionAsset.FindActionMap("Character", true);
+        public void OnBodyDetached(CharacterBody body) {
+            interactInputBank = null;
+            jumpInputBank = null;
+            moveInputBank = null;
+            primaryActionInputBank = null;
+            secondaryActionInputBank = null;
+            skillInputBank = null;
+            sprintInputBank = null;
+            _aimInputBank = null;
+            UnregisterCallback();
+            CharacterInputManager.Instance.DisableInput();
+            CursorManager.Instance.ShowCursor();
+            enabled = false;
+        }
+
+        private void Awake() {
+            _characterActionMap = InputSystem.actions.FindActionMap("Character", true);
             _move = _characterActionMap.FindAction("Move", true);
             _primaryAction = _characterActionMap.FindAction("PrimaryAction", true);
             _secondaryAction = _characterActionMap.FindAction("SecondaryAction", true);
@@ -64,17 +66,27 @@ namespace JoG {
             _sprint = _characterActionMap.FindAction("Sprint", true);
             _skill = _characterActionMap.FindAction("Skill", true);
             _interact = _characterActionMap.FindAction("Interact", true);
-            _disposable = subscriber.Subscribe(this);
+        }
+
+        private void Update() {
+            var state = PlayerCharacterCamera.State;
+            var origin = state.GetFinalPosition();
+            var rotation = state.GetFinalOrientation();
+            var direction = rotation * Vector3.forward;
+            var moveInput = _move.ReadValue<Vector2>();
+            moveInputBank.vector3 = rotation * new Vector3(moveInput.x, 0, moveInput.y);
+            if (Physics.Raycast(origin, direction, out var hit, 1000, aimCollisionFilter, QueryTriggerInteraction.Ignore)) {
+                _aimInputBank.vector3 = hit.point;
+            } else {
+                _aimInputBank.vector3 = origin + (1000 * direction);
+            }
         }
 
         private void OnDestroy() {
-            _characterActionMap?.Disable();
-            _disposable?.Dispose();
+            _characterActionMap.Disable();
         }
 
         private void RegisterCallback() {
-            _move.performed += OnMove;
-            _move.canceled += OnMove;
             _primaryAction.performed += OnPrimaryAction;
             _primaryAction.canceled += OnPrimaryAction;
             _secondaryAction.performed += OnSecondaryAction;
@@ -89,8 +101,6 @@ namespace JoG {
         }
 
         private void UnregisterCallback() {
-            _move.performed -= OnMove;
-            _move.canceled -= OnMove;
             _primaryAction.performed -= OnPrimaryAction;
             _primaryAction.canceled -= OnPrimaryAction;
             _secondaryAction.performed -= OnSecondaryAction;
@@ -102,11 +112,6 @@ namespace JoG {
             _interact.canceled -= OnInteract;
             _skill.performed -= OnSkill;
             _skill.canceled -= OnSkill;
-        }
-
-        private void OnMove(InputAction.CallbackContext context) {
-            var moveInput = context.ReadValue<Vector2>();
-            moveInputBank.vector3 = new Vector3(moveInput.x, 0, moveInput.y);
         }
 
         private void OnPrimaryAction(InputAction.CallbackContext context) {

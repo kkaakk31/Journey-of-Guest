@@ -1,5 +1,5 @@
 ﻿using EditorAttributes;
-using JoG.DebugExtensions;
+using GuestUnion.Extensions.Unity;
 using Steamworks;
 using Steamworks.Data;
 using System.Text;
@@ -36,9 +36,9 @@ namespace JoG.Lobby.View {
         public async void JoinLobby() {
             var result = await ThisLobby.Join();
             if (result is RoomEnter.Success) {
-                this.Log("Joined lobby: {0}", ThisLobby.Id);
+                this.Log($"Joined lobby: {ThisLobby.Id}");
             } else {
-                this.LogWarning("Failed to join lobby: {0}", ThisLobby.Id);
+                this.LogWarning($"Failed to join lobby: {ThisLobby.Id}");
             }
             ThisLobby.Leave();
         }

@@ -1,4 +1,4 @@
-﻿using GuestUnion;
+﻿using GuestUnion.Extensions;
 using System;
 
 namespace JoG.Attributes {
