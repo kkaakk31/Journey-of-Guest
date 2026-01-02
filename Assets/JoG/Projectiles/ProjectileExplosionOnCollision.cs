@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JoG.Projectiles {
 
-    public class ProjectileExplosionOnCollision : ProjectileExplosion, ICollisionHandler {
+    public class ProjectileExplosionOnCollision : ProjectileExplosion {
         [field: SerializeField] public PooledObject ExplosionPrefab { get; private set; }
 
         public void Handle(CollisionMessage message) {

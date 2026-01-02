@@ -1,57 +1,35 @@
-﻿using GuestUnion.Extensions;
+﻿using EditorAttributes;
 using JoG.Item.Datas;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace JoG.InventorySystem {
 
     public partial class Slot : IItemSlot {
-        private ItemData _itemData;
-        private int _itemCount;
-
+        [ReadOnly, SerializeField] private ItemData _itemData;
+        [ReadOnly, SerializeField] private int _itemCount;
         public ItemData ItemData {
             get => _itemData;
-            set {
+            private set {
+                Assert.IsNotNull(value);
                 _itemData = value;
-                if (value == null) {
-                    _itemCount = 0;
-                    countText.gameObject.SetActive(false);
-                    iconImage.gameObject.SetActive(false);
-                } else {
-                    iconImage.gameObject.SetActive(true);
-                    iconImage.sprite = value.iconSprite;
-                }
+                iconImage.sprite = _itemData.iconSprite;
             }
         }
 
         public int ItemCount {
             get => _itemCount;
             set {
-                if (_itemData == null) {
-                    return;
-                }
-                _itemCount = value.Clamp(0, _itemData.maxStack);
-                if (_itemCount > 1) {
-                    countText.gameObject.SetActive(true);
-                    countText.text = _itemCount.ToString();
-                    return;
-                }
-                countText.gameObject.SetActive(false);
-                if (_itemCount == 0) {
-                    _itemData = null;
-                    iconImage.gameObject.SetActive(false);
-                }
+                _itemCount = value < 0 ? 0 : value;
+                countText.text = _itemCount.ToString();
             }
         }
-        public bool IsEmpty => _itemCount is 0 || _itemData == null;
 
-        public int Index { get; set; }
+        public bool IsEmpty => _itemCount == 0;
 
-        public void Exchange(IItemSlot other) {
-            var tmp = ItemData;
-            var tmp2 = ItemCount;
-            ItemData = other.ItemData;
-            ItemCount = other.ItemCount;
-            other.ItemData = tmp;
-            other.ItemCount = tmp2;
+        public void Initialize(ItemData item, int itemCount) {
+            ItemData = item;
+            ItemCount = itemCount;
         }
     }
 }

@@ -1,27 +1,27 @@
 ﻿using EditorAttributes;
-using JoG.Buffs;
-using JoG.BuffSystem;
-using JoG.Character;
+using GuestUnion.YooAsset;
+using JoG.Buff.Datas;
 using UnityEngine;
 
 namespace JoG.HealthMessageHandlers {
 
     public class BurningBuffHandler : DamageMessageHandler {
-        [Clamp(0.001f, 1000)] public float damageCofficient = 0.5f;
-        public ushort damageCount = 5;
-        [SerializeField, Required] private HealthMessageProcessor _processor;
+        [SerializeField] private YooAssetReference<DoTData> _dotData;
+        public ushort damageCount;
 
         public override void Handle(in DamageMessage message) {
-            if (DamgeFlag.HasFlag(message, DamgeFlag.fire)) {
-                var buff = BuffPool.Rent<BurningBuff>();
-                buff.attacker = message.attacker;
-                buff.damageValuePerTick = (uint)(message.value * damageCofficient);
-                if (buff.damageValuePerTick < 1) {
-                    buff.damageValuePerTick = 1;
-                }
-                buff.damageCount = damageCount;
-                _processor.AddBuff(buff);
+            if (message.HasFlag(DamageFlags.Fire)) {
+                var buff = _dotData.AssetObject.RentDoT();
+                buff.Initialize(message.attacker, damageCount, message.value);
             }
+        }
+
+        private void Awake() {
+            _dotData.LoadAssetSync();
+        }
+
+        private void OnDestroy() {
+            _dotData.Dispose();
         }
     }
 }

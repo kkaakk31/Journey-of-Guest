@@ -1,24 +1,41 @@
+using EditorAttributes;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace JoG.Audio {
 
     public class NetworkAudioSource : NetworkBehaviour {
-        [SerializeField] private AudioSource _audioSource;
+        [Required, SerializeField] private AudioSource _audioSource;
 
         public AudioSource AudioSource => _audioSource;
         public bool IsPlaying => _audioSource.isPlaying;
 
-        public void Play() {
-            PlayRpc();
+        public void TogglePlay() {
+            if (IsPlaying) {
+                StopRpc();
+            } else {
+                PlayRpc();
+            }
         }
 
-        public void PlayOnShot() {
-            PlayOnShotRpc();
-        }
+        public void Play() => PlayRpc();
 
-        public void Stop() {
-            StopRpc();
+        public void PlayOneShot() => PlayOneShotRpc();
+
+        public void Stop() => StopRpc();
+
+        protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer) {
+            if (serializer.IsWriter) {
+                var writer = serializer.GetFastBufferWriter();
+                writer.WriteValueSafe(_audioSource.time);
+            } else {
+                var reader = serializer.GetFastBufferReader();
+                reader.ReadValueSafe(out float time);
+                if (time > 0) {
+                    _audioSource.time = time;
+                    _audioSource.Play();
+                }
+            }
         }
 
         [Rpc(SendTo.Everyone)]
@@ -27,7 +44,7 @@ namespace JoG.Audio {
         }
 
         [Rpc(SendTo.Everyone)]
-        private void PlayOnShotRpc() {
+        private void PlayOneShotRpc() {
             _audioSource.PlayOneShot(_audioSource.clip);
         }
 

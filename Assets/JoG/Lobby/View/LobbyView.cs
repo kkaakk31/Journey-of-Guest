@@ -5,12 +5,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using VContainer;
 
 namespace JoG.Lobby.View {
 
     public class LobbyView : MonoBehaviour {
         private SteamLobbyController controller;
-        [SerializeField, Required] private InputActionReference _displayActionReference;
+        [Inject,Key(Constants.InputAction.Lobby)] internal InputAction  _toggleInput;
         [SerializeField, Required] private GameObject _view;
         [SerializeField, Required] private LobbyMemberCard _cardPrefab;
         [SerializeField, Required] private Transform _inviteFriendCardTransform;
@@ -52,11 +53,11 @@ namespace JoG.Lobby.View {
         }
 
         private void Awake() {
-            _displayActionReference.action.performed += OnDisplayStateChanged;
+            _toggleInput.performed += OnDisplayStateChanged;
         }
 
         private void OnDestroy() {
-            _displayActionReference.action.performed -= OnDisplayStateChanged;
+            _toggleInput.performed -= OnDisplayStateChanged;
         }
 
         private void Init(string id, string name, byte maxMemers, ELobbyType lobbyType, bool interactable) {

@@ -3,24 +3,20 @@ using UnityEngine;
 
 namespace JoG.StateMachines {
 
+    [DisallowMultipleComponent]
     public class MonoStateMachine : MonoBehaviour, IStateMachine {
-        public State defaultState;
-        private IState _currentState;
-        private IState _nextState;
+        public State entryState;
+        private State _currentState;
 
-        public IState CurrentState => _currentState;
+        public State CurrentState => _currentState;
 
-        public void TransitionTo(IState state) {
+        public void TransitionTo(State state) {
             _currentState?.Exit();
-            if (state is null) {
-                _currentState = null;
-            } else {
-                state.Enter();
-                _currentState = state;
-            }
+            state?.Enter();
+            _currentState = state;
         }
 
-        protected void OnEnable() => TransitionTo(defaultState);
+        protected void OnEnable() => TransitionTo(entryState);
 
         protected void OnDisable() => TransitionTo(null);
     }

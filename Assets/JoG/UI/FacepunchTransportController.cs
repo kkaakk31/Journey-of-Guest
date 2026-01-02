@@ -6,8 +6,8 @@ using VContainer;
 namespace JoG.UI {
 
     public class FacepunchTransportController : MonoBehaviour {
-        [Inject] private FacepunchTransport _transport;
-        [Inject] private NetworkManager _networkManager;
+        [Inject] internal FacepunchTransport _transport;
+        [Inject] internal NetworkManager _networkManager;
 
         public void SetTargetSteamIdByString(string steamIdString) {
             if (ulong.TryParse(steamIdString, out var steamId)) {

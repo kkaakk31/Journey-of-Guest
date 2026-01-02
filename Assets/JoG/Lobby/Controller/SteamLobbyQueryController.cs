@@ -1,5 +1,5 @@
 using GuestUnion.Extensions;
-using GuestUnion.Extensions.Unity;
+using GuestUnion.Logging;
 using JoG.Lobby.View;
 using Steamworks;
 using Steamworks.Data;

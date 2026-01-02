@@ -1,4 +1,4 @@
-﻿using GuestUnion.Extensions.Unity;
+﻿using GuestUnion.Logging;
 using Netcode.Transports.Facepunch;
 using Steamworks;
 using System.Collections.Generic;
@@ -173,7 +173,7 @@ namespace JoG.Lobby.Controller {
             currentLobby = lobby;
             if (!lobby.Owner.IsMe) {
                 //multipass.SwitchTransport(1);
-                //facepunchTransport.SetIpAddress(lobby.Owner.Id.ToString());
+                //facepunchTransport.SetIpAddress(lobby.Owner.id.ToString());
                 //facepunchTransport.SetPortByString(ushort.Parse(lobby.GetData("port")));
                 //facepunchTransport.StartConnection(false);
             }

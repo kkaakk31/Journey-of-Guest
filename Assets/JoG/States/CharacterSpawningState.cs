@@ -1,29 +1,26 @@
-﻿using JoG.Character;
+﻿using EditorAttributes;
 using UnityEngine;
 
 namespace JoG.States {
 
     public class CharacterSpawningState : State {
-        public float duration = 1;
-        private float _spawnStartTime;
-        private CharacterBody _body;
-
-        protected override void Awake() {
-            base.Awake();
-            _body = GetComponentInParent<CharacterBody>();
-        }
-
-        protected override bool CheckTransitionIn() => _body.IsAlive;
-
-        protected override bool CheckTransitionOut() => Time.time - _spawnStartTime > duration;
+        [Required, SerializeField] private Animator _animator;
+        [Required, SerializeField] private State _next;
 
         protected void OnEnable() {
-            _body.Animator.SetBool(AnimationParameters.isSpawning, true);
-            _spawnStartTime = Time.time;
+            _animator.SetBool(AnimationParameters.isSpawning, true);
+        }
+
+        protected void Update() {
+            var state = _animator.GetCurrentAnimatorStateInfo(0);
+            if (state.IsTag("SpawnState")) {
+                return;
+            }
+            TransitionTo(_next);
         }
 
         protected void OnDisable() {
-            _body.Animator.SetBool(AnimationParameters.isSpawning, false);
+            _animator.SetBool(AnimationParameters.isSpawning, false);
         }
     }
 }

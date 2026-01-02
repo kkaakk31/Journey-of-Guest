@@ -1,6 +1,5 @@
 ﻿using EditorAttributes;
-using GuestUnion.TooltipSystem;
-using GuestUnion.TooltipSystem.Components;
+using GuestUnion.UI;
 using JoG.InteractionSystem;
 using JoG.Localization;
 using UnityEngine;
@@ -16,9 +15,7 @@ namespace JoG.Audio {
         void ITooltipSource.BuildTooltip(TooltipView view) {
         }
 
-        public bool CanInteract(Interactor interactor) {
-            return true;
-        }
+        public bool CanInteract(Interactor interactor) => true;
 
         public void PreformInteraction(Interactor interactor) {
             if (_audioSource.IsPlaying) {

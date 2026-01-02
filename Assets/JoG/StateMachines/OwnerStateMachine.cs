@@ -1,28 +1,25 @@
 ﻿using JoG.States;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace JoG.StateMachines {
 
+    [DisallowMultipleComponent]
     public class OwnerStateMachine : NetworkBehaviour, IStateMachine {
-        public State defaultState;
-        private IState _currentState;
-        private IState _nextState;
+        public State entryState;
+        private State _currentState;
 
-        public IState CurrentState => _currentState;
+        public State CurrentState => _currentState;
 
-        public void TransitionTo(IState state) {
+        public void TransitionTo(State state) {
             _currentState?.Exit();
-            if (state is null) {
-                _currentState = null;
-            } else {
-                state.Enter();
-                _currentState = state;
-            }
+            state?.Enter();
+            _currentState = state;
         }
 
         public override void OnNetworkSpawn() {
             if (IsOwner) {
-                TransitionTo(defaultState);
+                TransitionTo(entryState);
             }
         }
 
@@ -34,7 +31,7 @@ namespace JoG.StateMachines {
 
         protected override void OnOwnershipChanged(ulong previous, ulong current) {
             if (IsOwner) {
-                TransitionTo(defaultState);
+                TransitionTo(entryState);
             } else {
                 TransitionTo(null);
             }

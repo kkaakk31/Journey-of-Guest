@@ -1,30 +1,32 @@
-using GuestUnion.TooltipSystem.Components;
+using GuestUnion.UI;
 using JoG.InteractionSystem;
+using JoG.Localization;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
 
 namespace JoG {
 
-    public class Teleporter : InteractableObject {
+    public class Teleporter : MonoBehaviour, IInteractable, IWorldTooltipSource {
         public string nextSceneName = string.Empty;
-        [Inject] private NetworkManager _networkManager;
+        public Transform tooltipPoint;
+        [Inject] internal NetworkManager _networkManager;
+        Vector3 IWorldTooltipSource.TooltipPosition => tooltipPoint.position;
 
-        public override bool CanInteract(Interactor interactor) {
-            return IsSpawned;
+        public bool CanInteract(Interactor interactor) {
+            return _networkManager.LocalClient.IsSessionOwner;
         }
 
-        public void Activate() {
-            if (_networkManager.LocalClient.IsSessionOwner) {
-                _networkManager.SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);
-            }
+        public void PreformInteraction(Interactor interactor) {
+            _networkManager.SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);
         }
 
-        public override void PreformInteraction(Interactor interactor) {
-            Activate();
-        }
-
-        public override void BuildTooltip(TooltipView view) {
+        void ITooltipSource.BuildTooltip(TooltipView view) {
+            view.Header.SetActive(true);
+            view.HeaderText.SetText(Localizer.GetString("teleporter.name"));
+            view.Content.SetActive(true);
+            view.ContentText.SetText(Localizer.GetString("teleporter.desc", Localizer.GetString("scene." + nextSceneName)));
         }
     }
 }

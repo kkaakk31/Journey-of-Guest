@@ -1,11 +1,7 @@
-﻿using Unity.Netcode;
+﻿namespace JoG {
 
-namespace JoG {
+    public interface IDamageable : ITeamed {
 
-    public interface IDamageable {
-
-        void AddDamage(DamageMessage message);
-
-        void SubmitDamage();
+        void TakeDamage(in DamageMessage message);
     }
 }

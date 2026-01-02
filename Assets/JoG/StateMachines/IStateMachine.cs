@@ -3,8 +3,8 @@
 namespace JoG.StateMachines {
 
     public interface IStateMachine {
-        IState CurrentState { get; }
+        State CurrentState { get; }
 
-        void TransitionTo(IState state);
+        void TransitionTo(State state);
     }
 }

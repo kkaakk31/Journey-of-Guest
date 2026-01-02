@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 
 namespace JoG.Projectiles {
@@ -8,8 +7,14 @@ namespace JoG.Projectiles {
         public float lifetime = 10f;
         public float remainingLifetime;
 
-        public float Lifetime { get => lifetime; set => lifetime = value; }
-        public float RemainingLifetime { get => remainingLifetime; set => remainingLifetime = value; }
+        public float Lifetime {
+            get => lifetime;
+            set => lifetime = value;
+        }
+        public float RemainingLifetime {
+            get => remainingLifetime;
+            set => remainingLifetime = value;
+        }
 
         public override void OnNetworkSpawn() {
             remainingLifetime = lifetime;

@@ -1,5 +1,5 @@
 ﻿using EditorAttributes;
-using GuestUnion.Extensions.Unity;
+using GuestUnion.Extensions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

@@ -1,13 +1,10 @@
 ﻿namespace JoG {
 
-    public interface IHealth {
-        uint HP { get; }
-        uint MaxHP { get; }
-        float PercentHp { get; }
+    public interface IHealth : IIdentity {
+        int Health { get; }
+        int MaxHealth { get; }
+        float HealthRatio { get; }
         bool IsAlive { get; }
-
-        void Handle(in DamageMessage message);
-
-        void Handle(in HealingMessage message);
+        bool IsDead { get; }
     }
 }

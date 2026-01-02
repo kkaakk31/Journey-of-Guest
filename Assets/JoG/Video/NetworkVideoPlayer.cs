@@ -1,4 +1,4 @@
-﻿using System;
+﻿using EditorAttributes;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Video;
@@ -6,56 +6,44 @@ using UnityEngine.Video;
 namespace JoG.Video {
 
     public class NetworkVideoPlayer : NetworkBehaviour {
-        public NetworkVariable<bool> isPlaying = new(false, writePerm: NetworkVariableWritePermission.Owner);
-        public NetworkVariable<double> videoTime = new(0.0, writePerm: NetworkVariableWritePermission.Owner);
-
-        private const double ThresholdSeconds = 0.2;
-        [field: SerializeField] public VideoPlayer VideoPlayer { get; private set; }
+        [Required, SerializeField] private VideoPlayer _videoPlayer;
+        public VideoPlayer VideoPlayer => _videoPlayer;
+        public bool IsPlaying => _videoPlayer.isPlaying;
 
         public void TogglePlay() {
-            if (isPlaying.Value) {
+            if (IsPlaying) {
                 StopRpc();
             } else {
                 PlayRpc();
             }
         }
 
-        [Rpc(SendTo.Owner)]
-        public void PlayRpc() {
-            videoTime.Value = VideoPlayer.time;
-            isPlaying.Value = true;
-        }
+        public void Play() => PlayRpc();
 
-        [Rpc(SendTo.Owner)]
-        public void StopRpc() {
-            videoTime.Value = VideoPlayer.time;
-            isPlaying.Value = false;
-        }
+        public void Stop() => StopRpc();
 
-        protected void Awake() {
-            isPlaying.OnValueChanged = (oldValue, newValue) => {
-                if (newValue) {
-                    VideoPlayer.Play();
-                } else {
-                    VideoPlayer.Stop();
-                }
-            };
-
-            videoTime.OnValueChanged = (oldValue, newValue) => {
-                var diff = Mathf.Abs((float)(VideoPlayer.time - newValue));
-                if (diff > ThresholdSeconds) {
-                    VideoPlayer.time = newValue;
-                }
-            };
-        }
-
-        protected override void OnNetworkSessionSynchronized() {
-            VideoPlayer.time = videoTime.Value;
-            if (isPlaying.Value) {
-                VideoPlayer.Play();
+        protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer) {
+            if (serializer.IsWriter) {
+                var writer = serializer.GetFastBufferWriter();
+                writer.WriteValueSafe(_videoPlayer.frame);
             } else {
-                VideoPlayer.Stop();
+                var reader = serializer.GetFastBufferReader();
+                reader.ReadValueSafe(out long frame);
+                if (frame > 0) {
+                    _videoPlayer.frame = frame;
+                    _videoPlayer.Play();
+                }
             }
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void PlayRpc() {
+            _videoPlayer.Play();
+        }
+
+        [Rpc(SendTo.Everyone)]
+        private void StopRpc() {
+            _videoPlayer.Stop();
         }
     }
 }

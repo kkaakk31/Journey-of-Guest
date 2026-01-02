@@ -5,7 +5,7 @@
         private bool started;
         private bool canceled;
 
-        /// <summary>The action current value.</summary>
+        /// <summary>The action _current value.</summary>
         public bool Value => value;
 
         /// <summary>
@@ -24,7 +24,7 @@
             canceled = false;
         }
 
-        /// <summary>Updates the fields based on the current button state.</summary>
+        /// <summary>Updates the fields based on the _current button state.</summary>
         public void UpdateState(bool newState) {
             var previousValue = value;
             value = newState;

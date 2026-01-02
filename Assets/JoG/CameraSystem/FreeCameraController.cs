@@ -1,40 +1,27 @@
 using EditorAttributes;
 using GuestUnion.Extensions;
-using JoG.Character;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using VContainer;
 
 namespace JoG.CameraSystem {
 
-    public class FreeCameraController : MonoBehaviour, IBodyAttachHandler {
+    public class FreeCameraController : MonoBehaviour {
         private float cameraEulerX, cameraEulerY, cameraEulerZ;
         private Transform _trackingTarget;
-        private CharacterBody _body;
-        private InputAction _lookInput;
+        [Inject, Key(Constants.InputAction.Look)] internal InputAction _lookInput;
         [field: SerializeField, Required] public CinemachineCamera ThirdPersonCamera { get; private set; }
-
-        public void OnBodyAttached(CharacterBody body) {
-            _body = body;
-            enabled = true;
-        }
-
-        public void OnBodyDetached(CharacterBody body) {
-            _body = null;
-            enabled = false;
-        }
 
         private void Awake() {
             _trackingTarget = ThirdPersonCamera.Follow;
-            _lookInput = InputSystem.actions.FindAction("Look", true);
+        }
+
+        private void OnEnable() {
             _lookInput.performed += OnLook;
         }
 
-        private void Update() {
-            _trackingTarget.position = _body.AimOrigin;
-        }
-
-        private void OnDestroy() {
+        private void OnDisable() {
             _lookInput.performed -= OnLook;
         }
 

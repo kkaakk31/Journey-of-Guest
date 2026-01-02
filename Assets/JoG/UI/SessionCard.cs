@@ -1,37 +1,49 @@
-﻿using EditorAttributes;
-using JoG.Networking;
+﻿using Cysharp.Text;
+using EditorAttributes;
+using System;
 using TMPro;
-using Unity.Services.Multiplayer;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace JoG.UI {
 
-    public class SessionCard : MonoBehaviour {
-        public ISessionService sessionService;
-        private string _sessionId;
-        [field: SerializeField, Required] public TMP_Text NameText { get; private set; }
-        [field: SerializeField, Required] public TMP_Text PlayerCountText { get; private set; }
-        [field: SerializeField, Required] public Button JoinButton { get; private set; }
+    public class SessionCard : Selectable, IPointerClickHandler {
+        [Required, SerializeField] private TextMeshProUGUI _nameText;
+        [Required, SerializeField] private TextMeshProUGUI _playerCountText;
+        public object Data { get; set; }
 
-        public void UpdateView(ISessionInfo sessionInfo) {
-            NameText.text = sessionInfo.Name;
-            PlayerCountText.text = $"{sessionInfo.MaxPlayers - sessionInfo.AvailableSlots}/{sessionInfo.MaxPlayers}";
-            _sessionId = sessionInfo.Id;
+        public event Action<object> OnClick;
+
+        public void UpdateView(string sessionName, int availableSlots, int maxPlayers) {
+            _nameText.text = sessionName;
+            using var sb = ZString.CreateStringBuilder(true);
+            sb.Append(maxPlayers - availableSlots);
+            sb.Append('/');
+            sb.Append(maxPlayers);
+            _playerCountText.SetText(sb);
         }
 
-        private void Awake() {
-            JoinButton.onClick.AddListener(JoinSession);
-        }
-
-        private async void JoinSession() {
-            var result = await LoadingManager.Loading(sessionService.JoinSessionByIdAsync(_sessionId),"加入中······");
-            if (result is "success") {
-                var sessionCode = sessionService.SessionCode;
-                PopupManager.PopupConfirm($"加入成功，是否将会话代码{sessionCode}复制到剪切板，以便他人加入使用。", () => GUIUtility.systemCopyBuffer = sessionCode);
-            } else {
-                PopupManager.PopupConfirm("加入失败：" + result);
+        void IPointerClickHandler.OnPointerClick(PointerEventData eventData) {
+            if (eventData.button == PointerEventData.InputButton.Left) {
+                OnClick?.Invoke(Data);
             }
         }
+
+        //private async void JoinSession() {
+        //    using (_popupManager.PopupLoader()) {
+        //        try {
+        //            await sessionService.JoinSessionByIdAsync(_sessionId);
+        //        } catch (Exception e) {
+        //            this.LogException(e);
+        //            var error = Localizer.GetString(L10nKeys.Session.Join.Failed, e.Message);
+        //            _popupManager.PopupMessage(error, MessageLevel.Error);
+        //            return;
+        //        }
+        //    }
+        //    var message = Localizer.GetString(L10nKeys.Session.Join.Joined, sessionService.Session.Code);
+        //    GUIUtility.systemCopyBuffer = sessionService.Session.Code;
+        //    _popupManager.PopupToast(message, MessageLevel.Info, ToastPosition.TopRight);
+        //}
     }
 }

@@ -1,5 +1,5 @@
 ﻿using EditorAttributes;
-using GuestUnion.Extensions.Unity;
+using GuestUnion.Logging;
 using Steamworks;
 using Steamworks.Data;
 using System.Text;

@@ -1,4 +1,7 @@
-﻿using JoG.Networking;
+﻿using GuestUnion.Logging;
+using GuestUnion.UI;
+using JoG.Localization;
+using JoG.Networking;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +10,8 @@ using VContainer;
 namespace JoG.UI {
 
     public class JoinSessionPanel : MonoBehaviour {
-        [Inject] private ISessionService _sessionService;
+        [Inject] internal ISessionService _sessionService;
+        [Inject] internal PopupManager PopupManager;
         [field: SerializeField] public TMP_InputField SessionCodeInputField { get; private set; }
         [field: SerializeField] public TMP_InputField PasswordInputField { get; private set; }
         [field: SerializeField] public Button JoinButton { get; private set; }
@@ -20,10 +24,17 @@ namespace JoG.UI {
         }
 
         private async void JoinSession() {
-            var result = await LoadingManager.Loading(_sessionService.JoinSessionAsync(SessionCodeInputField.text, PasswordInputField.text),"加入中······");
-            if (result is not "success") {
-                PopupManager.PopupConfirm("加入失败：" + result);
-            };
+            using (PopupManager.PopupLoader()) {
+                try {
+                    var sessionCode = SessionCodeInputField.text;
+                    var password = PasswordInputField.text;
+                    await _sessionService.JoinSessionByCodeAsync(sessionCode, password);
+                } catch (System.Exception e) {
+                    this.LogException(e);
+                    var error = Localizer.GetString(L10nKeys.Session.Join.Failed, e.Message);
+                    PopupManager.PopupMessage(error, MessageLevel.Error);
+                }
+            }
         }
     }
 }

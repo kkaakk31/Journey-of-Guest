@@ -8,8 +8,8 @@ using VContainer;
 namespace JoG.UI {
 
     public class UnityTransportPanel : MonoBehaviour {
-        [Inject] private NetworkManager _networkManager;
-        [Inject] private UnityTransport _transport;
+        [Inject] internal NetworkManager _networkManager;
+        [Inject] internal UnityTransport _transport;
         [SerializeField, Required] private TMP_InputField _ipInputField;
         [SerializeField, Required] private TMP_InputField _portInputField;
 

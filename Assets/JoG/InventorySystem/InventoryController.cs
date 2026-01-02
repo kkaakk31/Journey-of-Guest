@@ -1,81 +1,38 @@
 ﻿using EditorAttributes;
 using JoG.Character;
+using JoG.InteractionSystem;
+using JoG.Item;
+using JoG.Item.Datas;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
+using VContainer;
 
 namespace JoG.InventorySystem {
 
-    public class InventoryController : MonoBehaviour,IBodyAttachHandler {
-        [ReadOnly] public int selectedIndex = 0;
-        [SerializeField, Required] private InputActionReference _numberInput;
-        [SerializeField, Required] private InputActionReference _tableToggle;
-        [SerializeField, Required] private InventoryTableView _tableView;
-        private CharacterBody _body;
-        private IInventory _inventory;
-        private IItemUser _itemUser;
+    public class InventoryController : MonoBehaviour, INetworkBehaviour {
+        [Required, SerializeField] private CharacterInventory _inventory;
+        [Required, SerializeField] private InventoryTableView _tableView;
+        [Required, SerializeField] private BuffCollection _buffCollection;
+        [Required, SerializeField] private Interactor _interactor;
+        [Inject, Key(Constants.InputAction.Inventory)] internal InputAction _tableToggle;
 
-        public void OnBodyAttached(CharacterBody body) {
-            _body = body;
-            if (_body.TryGetComponent(out _itemUser)) {
-                _itemUser.Inventory = _inventory;
-                SelectItem(selectedIndex);
+        void INetworkBehaviour.OnSpawn() {
+            foreach (var item in _inventory.Items) {
+                foreach (var buffData in item.ItemData.buffDatas) {
+                    var buff = buffData.RentItemBuff(item.ItemCount);
+                    _buffCollection.AddBuffOnEveryone(buff);
+                }
             }
-            _numberInput.action.performed += OnNumInput;
-            _tableToggle.action.performed += OnTableToggle;
-            _numberInput.action.Enable();
-            _tableToggle.action.Enable();
+            _interactor.OnInteract += OnBodyInteract;
+            _inventory.OnItemCountChanged += OnInventoryItemCountChanged;
+            _tableToggle.performed += OnTableToggle;
         }
 
-        public void OnBodyDetached(CharacterBody body) {
-            _body = null;
-            if (_itemUser != null) {
-                _itemUser.Inventory = null;
-            }
-            _itemUser = null;
-            _numberInput.action.performed -= OnNumInput;
-            _tableToggle.action.performed -= OnTableToggle;
-            _numberInput.action.Disable();
-            _tableToggle.action.Disable();
-        }
-
-        public void SelectItem(int index) {
-            selectedIndex = index;
-            _itemUser.Use(_inventory[index]);
-            //view.HighlightSlot(index);
-        }
-
-        protected void Awake() {
-            _inventory = GetComponent<Inventory>();
-        }
-
-        private void OnNumInput(InputAction.CallbackContext context) {
-            int idx = -1;
-            switch ((context.control as KeyControl).keyCode) {
-                case Key.Digit1:
-                case Key.Numpad1: idx = 0; break;
-                case Key.Digit2:
-                case Key.Numpad2: idx = 1; break;
-                case Key.Digit3:
-                case Key.Numpad3: idx = 2; break;
-                case Key.Digit4:
-                case Key.Numpad4: idx = 3; break;
-                case Key.Digit5:
-                case Key.Numpad5: idx = 4; break;
-                case Key.Digit6:
-                case Key.Numpad6: idx = 5; break;
-                case Key.Digit7:
-                case Key.Numpad7: idx = 6; break;
-                case Key.Digit8:
-                case Key.Numpad8: idx = 7; break;
-                case Key.Digit9:
-                case Key.Numpad9: idx = 8; break;
-                case Key.Digit0:
-                case Key.Numpad0: idx = 9; break;
-            }
-            if (idx >= 0) {
-                SelectItem(idx);
-            }
+        void INetworkBehaviour.OnDespawn() {
+            _interactor.OnInteract -= OnBodyInteract;
+            _inventory.OnItemCountChanged -= OnInventoryItemCountChanged;
+            _tableToggle.performed -= OnTableToggle;
         }
 
         private void OnTableToggle(InputAction.CallbackContext callback) {
@@ -83,6 +40,29 @@ namespace JoG.InventorySystem {
                 _tableView.Hide();
             } else {
                 _tableView.Show();
+            }
+        }
+
+        private void OnBodyInteract(IInteractable interactableObject) {
+            if (interactableObject is ItemPickup pickup) {
+                pickup.TryPickup(NetworkManager.Singleton.LocalClientId, OnPickup);
+            }
+        }
+
+        private void OnPickup(ItemData itemData, int amount) {
+            _inventory.AddItem(itemData, amount);
+        }
+
+        private void OnInventoryItemCountChanged(ItemData itemData, int itemCount) {
+            if (itemCount > 0) {
+                foreach (var buffData in itemData.buffDatas) {
+                    var buff = buffData.RentItemBuff(itemCount);
+                    _buffCollection.AddBuffOnEveryone(buff);
+                }
+            } else {
+                foreach (var buffData in itemData.buffDatas) {
+                    _buffCollection.RemoveBuffOnEveryone(buffData.index);
+                }
             }
         }
     }

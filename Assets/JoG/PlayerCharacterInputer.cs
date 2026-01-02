@@ -4,89 +4,43 @@ using JoG.Character.InputBanks;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using VContainer;
 
 namespace JoG {
 
-    public class PlayerCharacterInputer : MonoBehaviour, IBodyAttachHandler {
+    [DefaultExecutionOrder(-10)]
+    public class PlayerCharacterInputer : MonoBehaviour {
         public LayerMask aimCollisionFilter;
+        [Inject] internal InputBankProvider _inputBankProvider;
+        [Inject, Key(Constants.InputAction.Move)] internal InputAction _move;
+        [Inject, Key(Constants.InputAction.PrimaryAction)] internal InputAction _primaryAction;
+        [Inject, Key(Constants.InputAction.SecondaryAction)] internal InputAction _secondaryAction;
+        [Inject, Key(Constants.InputAction.Jump)] internal InputAction _jump;
+        [Inject, Key(Constants.InputAction.Sprint)] internal InputAction _sprint;
+        [Inject, Key(Constants.InputAction.Skill)] internal InputAction _skill;
+        [Inject, Key(Constants.InputAction.Interact)] internal InputAction _interact;
         private BooleanInputBank sprintInputBank;
         private TriggerInputBank interactInputBank;
         private TriggerInputBank jumpInputBank;
         private TriggerInputBank primaryActionInputBank;
         private TriggerInputBank secondaryActionInputBank;
         private TriggerInputBank skillInputBank;
-        private Vector3InputBank moveInputBank;
-        private InputActionMap _characterActionMap;
-        private InputAction _move;
-        private InputAction _primaryAction;
-        private InputAction _secondaryAction;
-        private InputAction _jump;
-        private InputAction _sprint;
-        private InputAction _skill;
-        private InputAction _interact;
+        private Vector3InputBank _moveInputBank;
         private Vector3InputBank _aimInputBank;
         [field: SerializeField, Required] public CinemachineCamera PlayerCharacterCamera { get; private set; }
 
-        public void OnBodyAttached(CharacterBody body) {
-            interactInputBank = body.GetInputBank<TriggerInputBank>("Interact");
-            jumpInputBank = body.GetInputBank<TriggerInputBank>("Jump");
-            moveInputBank = body.GetInputBank<Vector3InputBank>("Move");
-            primaryActionInputBank = body.GetInputBank<TriggerInputBank>("PrimaryAction");
-            secondaryActionInputBank = body.GetInputBank<TriggerInputBank>("SecondaryAction");
-            skillInputBank = body.GetInputBank<TriggerInputBank>("Skill");
-            sprintInputBank = body.GetInputBank<BooleanInputBank>("Sprint");
-            _aimInputBank = body.GetInputBank<Vector3InputBank>("Aim");
-            RegisterCallback();
-            CharacterInputManager.Instance.EnableInput();
-            CursorManager.Instance.HideCursor();
-            enabled = true;
-        }
-
-        public void OnBodyDetached(CharacterBody body) {
-            interactInputBank = null;
-            jumpInputBank = null;
-            moveInputBank = null;
-            primaryActionInputBank = null;
-            secondaryActionInputBank = null;
-            skillInputBank = null;
-            sprintInputBank = null;
-            _aimInputBank = null;
-            UnregisterCallback();
-            CharacterInputManager.Instance.DisableInput();
-            CursorManager.Instance.ShowCursor();
-            enabled = false;
-        }
-
         private void Awake() {
-            _characterActionMap = InputSystem.actions.FindActionMap("Character", true);
-            _move = _characterActionMap.FindAction("Move", true);
-            _primaryAction = _characterActionMap.FindAction("PrimaryAction", true);
-            _secondaryAction = _characterActionMap.FindAction("SecondaryAction", true);
-            _jump = _characterActionMap.FindAction("Jump", true);
-            _sprint = _characterActionMap.FindAction("Sprint", true);
-            _skill = _characterActionMap.FindAction("Skill", true);
-            _interact = _characterActionMap.FindAction("Interact", true);
+            interactInputBank = _inputBankProvider.GetInputBank<TriggerInputBank>("Interact");
+            jumpInputBank = _inputBankProvider.GetInputBank<TriggerInputBank>("Jump");
+            _moveInputBank = _inputBankProvider.GetInputBank<Vector3InputBank>("Move");
+            primaryActionInputBank = _inputBankProvider.GetInputBank<TriggerInputBank>("PrimaryAction");
+            secondaryActionInputBank = _inputBankProvider.GetInputBank<TriggerInputBank>("SecondaryAction");
+            skillInputBank = _inputBankProvider.GetInputBank<TriggerInputBank>("Skill");
+            sprintInputBank = _inputBankProvider.GetInputBank<BooleanInputBank>("Sprint");
+            _aimInputBank = _inputBankProvider.GetInputBank<Vector3InputBank>("Aim");
         }
 
-        private void Update() {
-            var state = PlayerCharacterCamera.State;
-            var origin = state.GetFinalPosition();
-            var rotation = state.GetFinalOrientation();
-            var direction = rotation * Vector3.forward;
-            var moveInput = _move.ReadValue<Vector2>();
-            moveInputBank.vector3 = rotation * new Vector3(moveInput.x, 0, moveInput.y);
-            if (Physics.Raycast(origin, direction, out var hit, 1000, aimCollisionFilter, QueryTriggerInteraction.Ignore)) {
-                _aimInputBank.vector3 = hit.point;
-            } else {
-                _aimInputBank.vector3 = origin + (1000 * direction);
-            }
-        }
-
-        private void OnDestroy() {
-            _characterActionMap.Disable();
-        }
-
-        private void RegisterCallback() {
+        private void OnEnable() {
             _primaryAction.performed += OnPrimaryAction;
             _primaryAction.canceled += OnPrimaryAction;
             _secondaryAction.performed += OnSecondaryAction;
@@ -100,7 +54,21 @@ namespace JoG {
             _skill.canceled += OnSkill;
         }
 
-        private void UnregisterCallback() {
+        private void Update() {
+            var state = PlayerCharacterCamera.State;
+            var origin = state.GetFinalPosition();
+            var rotation = state.GetFinalOrientation();
+            var direction = rotation * Vector3.forward;
+            if (Physics.Raycast(origin, direction, out var hit, 1000, aimCollisionFilter, QueryTriggerInteraction.Ignore)) {
+                _aimInputBank.vector3 = hit.point;
+            } else {
+                _aimInputBank.vector3 = origin + (1000 * direction);
+            }
+            var moveInput = _move.ReadValue<Vector2>();
+            _moveInputBank.vector3 = rotation * new Vector3(moveInput.x, 0, moveInput.y);
+        }
+
+        private void OnDisable() {
             _primaryAction.performed -= OnPrimaryAction;
             _primaryAction.canceled -= OnPrimaryAction;
             _secondaryAction.performed -= OnSecondaryAction;

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace JoG {
 
-namespace JoG {
     public static class Tags {
-        public static string Player => "Player";
+        public const string Player = nameof(Player);
+        public const string ColorImage = nameof(ColorImage);
     }
 }

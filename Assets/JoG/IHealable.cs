@@ -1,9 +1,7 @@
 ﻿namespace JoG {
 
-    public interface IHealable {
+    public interface IHealable : ITeamed {
 
-        void AddHealing(HealingMessage message);
-
-        void SubmitHealing();
+        void TakeHeal(in HealMessage message);
     }
 }
